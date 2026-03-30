@@ -45,8 +45,14 @@ class MainWindow(QMainWindow):
 
     def _setup_window(self) -> None:
         self.setWindowTitle("Git Dashboard")
-        self.setMinimumSize(900, 600)
-        self.resize(1100, 700)
+        self.setMinimumSize(920, 620)
+        self.resize(1100, 720)
+        # macOS 타이틀바 다크 처리
+        try:
+            from PyQt6.QtGui import QColor
+            from PyQt6.QtCore import Qt as QtCore
+        except ImportError:
+            pass
 
     def _setup_toolbar(self) -> None:
         toolbar = QToolBar("메인 툴바")

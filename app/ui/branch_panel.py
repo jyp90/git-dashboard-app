@@ -47,16 +47,25 @@ class BranchPanel(QWidget):
 
     def _setup_ui(self) -> None:
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(12, 12, 12, 12)
+        layout.setContentsMargins(16, 16, 16, 16)
         layout.setSpacing(12)
 
-        # ── 상태 헤더 ──────────────────────────────────────────────────
+        # ── 상태 헤더 카드 ─────────────────────────────────────────────
         header = QFrame()
         header.setFrameShape(QFrame.Shape.StyledPanel)
+        header.setMinimumHeight(64)
         header_layout = QHBoxLayout(header)
+        header_layout.setContentsMargins(16, 12, 16, 12)
 
-        self._branch_label = QLabel("브랜치: —")
-        self._branch_label.setStyleSheet("font-size:16px; font-weight:bold;")
+        # 브랜치 아이콘 + 이름
+        branch_icon = QLabel("⎇")
+        branch_icon.setStyleSheet("font-size:20px; color:#818cf8; margin-right:4px;")
+        header_layout.addWidget(branch_icon)
+
+        self._branch_label = QLabel("—")
+        self._branch_label.setStyleSheet(
+            "font-size:17px; font-weight:700; color:#e2e8f0; font-family:'SF Mono','Menlo',monospace;"
+        )
         header_layout.addWidget(self._branch_label)
 
         self._status_badge = _StatusBadge()
@@ -65,17 +74,30 @@ class BranchPanel(QWidget):
 
         header_layout.addStretch()
 
+        # ahead/behind 카운터
+        counter_widget = QWidget()
+        counter_widget.setStyleSheet(
+            "background:#252540; border-radius:6px; padding:4px 10px;"
+        )
+        counter_layout = QHBoxLayout(counter_widget)
+        counter_layout.setContentsMargins(8, 4, 8, 4)
+        counter_layout.setSpacing(12)
         self._ahead_label = QLabel("↑ —")
+        self._ahead_label.setStyleSheet("color:#10b981; font-weight:600; font-size:13px;")
         self._behind_label = QLabel("↓ —")
-        header_layout.addWidget(self._ahead_label)
-        header_layout.addWidget(self._behind_label)
+        self._behind_label.setStyleSheet("color:#f59e0b; font-weight:600; font-size:13px;")
+        counter_layout.addWidget(self._ahead_label)
+        counter_layout.addWidget(self._behind_label)
+        header_layout.addWidget(counter_widget)
 
         layout.addWidget(header)
 
         # ── 액션 버튼 ──────────────────────────────────────────────────
         btn_layout = QHBoxLayout()
-        self._sync_btn = QPushButton("⟳ Sync Develop")
+        btn_layout.setSpacing(8)
+        self._sync_btn = QPushButton("↻  Sync Develop")
         self._sync_btn.setToolTip("origin/develop을 fetch 후 develop 브랜치를 업데이트합니다")
+        self._sync_btn.setFixedHeight(36)
         self._sync_btn.clicked.connect(self._on_sync_clicked)
         btn_layout.addWidget(self._sync_btn)
         btn_layout.addStretch()
@@ -116,7 +138,7 @@ class BranchPanel(QWidget):
         self._controller.sync_develop()
 
     def _update_summary(self, summary: BranchSummary) -> None:
-        self._branch_label.setText(f"브랜치: {summary.current}")
+        self._branch_label.setText(summary.current)
         self._status_badge.set_status(summary.status)
         dirty_icon = " ✦" if summary.is_dirty else ""
         self._ahead_label.setText(f"↑ {summary.ahead}{dirty_icon}")
