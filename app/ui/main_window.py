@@ -133,7 +133,7 @@ class MainWindow(QMainWindow):
 
     def _on_branch_summary(self, summary: BranchSummary) -> None:
         # 사이드바 상태 아이콘 업데이트
-        active = self._controller._config.get_active_repo()
+        active = self._controller.get_active_repo()
         if active:
             self._sidebar.update_repo_status(active.path, summary.status)
         status = summary.status.value.upper()

@@ -87,6 +87,40 @@ class GitRepository:
             remote_branches=remote,
         )
 
+    def has_branch(self, name: str) -> bool:
+        """로컬 브랜치 존재 여부 확인."""
+        return name in [b.name for b in self._repo.branches]
+
+    def create_branch(self, name: str, base: str | None = None) -> None:
+        """브랜치 생성 후 체크아웃. base가 None이면 현재 HEAD 기준."""
+        if self.has_branch(name):
+            raise GitRepositoryError(f"브랜치가 이미 존재합니다: {name}")
+        if base:
+            candidates = [b for b in self._repo.branches if b.name == base]
+            base_ref = candidates[0] if candidates else self._repo.active_branch
+        else:
+            base_ref = self._repo.active_branch
+        new_branch = self._repo.create_head(name, base_ref)
+        new_branch.checkout()
+
+    def get_diff_stats(self, base_branch: str = "develop") -> dict:
+        """현재 브랜치와 base_branch 간 변경 파일 통계 반환."""
+        try:
+            base = self._repo.commit(base_branch)
+            head = self._repo.head.commit
+            diff = base.diff(head)
+            return {
+                "files_changed": len(diff),
+                "insertions": sum(d.diff.count(b"\n+") for d in diff if d.diff),
+                "deletions": sum(d.diff.count(b"\n-") for d in diff if d.diff),
+            }
+        except Exception:
+            return {"files_changed": 0, "insertions": 0, "deletions": 0}
+
+    def get_recent_commit_messages(self, limit: int = 20) -> list[str]:
+        """최근 N개 커밋 메시지 반환."""
+        return [c.message.strip() for c in self._repo.iter_commits(max_count=limit)]
+
     def fetch(self) -> None:
         """origin 리모트 fetch."""
         if self._repo.remotes:

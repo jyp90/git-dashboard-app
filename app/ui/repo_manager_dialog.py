@@ -120,7 +120,7 @@ class RepoManagerDialog(QDialog):
 
     def _load_repos(self) -> None:
         self._list.clear()
-        for repo in self._controller._config.get_repositories():
+        for repo in self._controller.get_repositories():
             item = QListWidgetItem()
             active_mark = "  ●" if repo.is_active else "   "
             item.setText(f"{active_mark}  {repo.name}   —   {repo.path}")

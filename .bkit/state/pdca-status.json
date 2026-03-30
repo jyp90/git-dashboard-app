@@ -1,0 +1,1300 @@
+{
+  "version": "2.0",
+  "lastUpdated": "2026-03-30T14:03:50.740Z",
+  "activeFeatures": [
+    "scripts",
+    "com~apple~CloudDocs",
+    ".claude",
+    "raycast",
+    "steps",
+    "service",
+    "util",
+    "api",
+    "python-llm-qa-skill",
+    "tmp",
+    "bin",
+    "vpn-auto-switch-kit",
+    ".zshrc.d",
+    "telegram-claude",
+    "slack-claude-session",
+    "domain",
+    "infrastructure",
+    "tests",
+    "controller",
+    "ui",
+    "git-dashboard"
+  ],
+  "primaryFeature": "scripts",
+  "features": {
+    "scripts": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-16T02:07:58.371Z",
+        "lastUpdated": "2026-03-20T09:45:20.735Z"
+      },
+      "lastFile": "/Users/jypark/.claude/scripts/zshrc-additions.sh"
+    },
+    "com~apple~CloudDocs": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-16T02:21:03.115Z",
+        "lastUpdated": "2026-02-22T14:30:33.772Z"
+      },
+      "lastFile": "/Users/jypark/Library/Mobile Documents/com~apple~CloudDocs/claude-restore.sh"
+    },
+    ".claude": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-19T07:30:02.184Z",
+        "lastUpdated": "2026-03-20T09:38:45.919Z"
+      },
+      "lastFile": "/Users/jypark/.claude/statusline.sh"
+    },
+    "raycast": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-21T14:49:20.476Z",
+        "lastUpdated": "2026-02-21T14:49:24.677Z"
+      },
+      "lastFile": "/Users/jypark/.claude/scripts/raycast/claude-new.sh"
+    },
+    "steps": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-10T07:52:14.233Z",
+        "lastUpdated": "2026-03-10T08:02:59.160Z"
+      },
+      "lastFile": "/Users/jypark/PyCharmProjects/ai-reader-api/app/domain/reader/worker/steps/llm_step.py"
+    },
+    "service": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-10T07:53:04.367Z",
+        "lastUpdated": "2026-03-10T10:18:56.231Z"
+      },
+      "lastFile": "/Users/jypark/PyCharmProjects/ai-reader-api/app/domain/reader/application/service/translation_service.py"
+    },
+    "util": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-10T10:04:21.514Z",
+        "lastUpdated": "2026-03-10T10:18:30.922Z"
+      },
+      "lastFile": "/Users/jypark/PyCharmProjects/ai-reader-api/app/shared/util/text_utils.py"
+    },
+    "api": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-10T10:04:43.570Z",
+        "lastUpdated": "2026-03-10T10:04:43.570Z"
+      },
+      "lastFile": "/Users/jypark/PyCharmProjects/ai-reader-api/app/domain/reader/api/ai_pdf.py"
+    },
+    "python-llm-qa-skill": {
+      "phase": "archived",
+      "matchRate": 100,
+      "iterationCount": 2,
+      "startedAt": "2026-03-12T14:29:56.727Z",
+      "archivedAt": "2026-03-12T00:00:00.000Z",
+      "archivedTo": "docs/archive/2026-03/python-llm-qa-skill/"
+    },
+    "tmp": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-12T16:12:18.694Z",
+        "lastUpdated": "2026-03-12T16:13:27.008Z"
+      },
+      "lastFile": "/tmp/setup_vpn_improvements.sh"
+    },
+    "bin": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-16T04:41:51.898Z",
+        "lastUpdated": "2026-03-20T00:39:47.805Z"
+      },
+      "lastFile": "/Users/jypark/.local/bin/network-switch-watchdog.sh"
+    },
+    "vpn-auto-switch-kit": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-17T05:25:15.095Z",
+        "lastUpdated": "2026-03-17T05:43:47.484Z"
+      },
+      "lastFile": "/Users/jypark/Documents/vpn-auto-switch-kit/install.sh"
+    },
+    ".zshrc.d": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-18T04:27:46.214Z",
+        "lastUpdated": "2026-03-18T04:30:35.989Z"
+      },
+      "lastFile": "/Users/jypark/.zshrc.d/00-env.sh"
+    },
+    "telegram-claude": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-20T10:24:56.740Z",
+        "lastUpdated": "2026-03-20T12:15:37.725Z"
+      },
+      "lastFile": "/Users/jypark/Projects/telegram-claude/install-new-device.sh"
+    },
+    "slack-claude-session": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-20T12:23:28.266Z",
+        "lastUpdated": "2026-03-30T12:08:05.224Z"
+      },
+      "lastFile": "/Users/jypark/Documents/Claude/slack-claude-session/server.ts"
+    },
+    "domain": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-30T12:50:00.074Z",
+        "lastUpdated": "2026-03-30T14:01:37.574Z"
+      },
+      "lastFile": "/Users/jypark/Documents/Claude/Projects/git-dashboard/app/domain/pr_checker.py"
+    },
+    "infrastructure": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-30T12:50:16.511Z",
+        "lastUpdated": "2026-03-30T14:01:46.777Z"
+      },
+      "lastFile": "/Users/jypark/Documents/Claude/Projects/git-dashboard/app/infrastructure/script_runner.py"
+    },
+    "tests": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-30T12:50:44.583Z",
+        "lastUpdated": "2026-03-30T12:50:54.487Z"
+      },
+      "lastFile": "/Users/jypark/Documents/Claude/Projects/git-dashboard/tests/test_config_store.py"
+    },
+    "controller": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-30T12:51:27.668Z",
+        "lastUpdated": "2026-03-30T14:00:36.594Z"
+      },
+      "lastFile": "/Users/jypark/Documents/Claude/Projects/git-dashboard/app/controller/workflow_controller.py"
+    },
+    "ui": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-30T12:52:03.770Z",
+        "lastUpdated": "2026-03-30T14:03:50.740Z"
+      },
+      "lastFile": "/Users/jypark/Documents/Claude/Projects/git-dashboard/app/ui/commit_log_panel.py"
+    },
+    "git-dashboard": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-30T12:52:45.940Z",
+        "lastUpdated": "2026-03-30T14:03:20.856Z"
+      },
+      "lastFile": "/Users/jypark/Documents/Claude/Projects/git-dashboard/main.py"
+    }
+  },
+  "pipeline": {
+    "currentPhase": 1,
+    "level": "Dynamic",
+    "phaseHistory": []
+  },
+  "session": {
+    "startedAt": "2026-02-02T01:52:09.223Z",
+    "onboardingCompleted": false,
+    "lastActivity": "2026-03-30T14:03:50.740Z"
+  },
+  "history": [
+    {
+      "timestamp": "2026-02-16T02:07:58.371Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-16T02:08:35.199Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-16T02:16:26.552Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-16T02:16:42.603Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-16T02:21:03.115Z",
+      "feature": "com~apple~CloudDocs",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-16T02:21:09.688Z",
+      "feature": "com~apple~CloudDocs",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-16T02:21:22.453Z",
+      "feature": "com~apple~CloudDocs",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-16T02:21:27.734Z",
+      "feature": "com~apple~CloudDocs",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-16T02:21:34.035Z",
+      "feature": "com~apple~CloudDocs",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-16T02:21:41.001Z",
+      "feature": "com~apple~CloudDocs",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-16T02:22:18.321Z",
+      "feature": "com~apple~CloudDocs",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-16T03:42:40.691Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-16T03:43:44.302Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-16T03:43:56.015Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-16T03:49:09.718Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-16T03:49:26.911Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-16T03:49:50.965Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-16T03:56:55.488Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-16T04:07:06.035Z",
+      "feature": "com~apple~CloudDocs",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-16T04:07:13.154Z",
+      "feature": "com~apple~CloudDocs",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-16T04:07:13.199Z",
+      "feature": "com~apple~CloudDocs",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-16T04:07:13.244Z",
+      "feature": "com~apple~CloudDocs",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-16T04:07:13.294Z",
+      "feature": "com~apple~CloudDocs",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-16T04:07:43.088Z",
+      "feature": "com~apple~CloudDocs",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-16T04:08:15.046Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-16T04:39:10.922Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-16T04:43:18.054Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-16T14:45:14.347Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-16T14:45:27.253Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-17T05:20:37.167Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-17T06:12:32.557Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-17T06:12:43.243Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T07:30:02.184Z",
+      "feature": ".claude",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T07:34:26.851Z",
+      "feature": ".claude",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T07:54:30.219Z",
+      "feature": ".claude",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T07:55:56.928Z",
+      "feature": ".claude",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-21T14:49:20.476Z",
+      "feature": "raycast",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-21T14:49:24.677Z",
+      "feature": "raycast",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-22T14:30:33.772Z",
+      "feature": "com~apple~CloudDocs",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-10T07:52:14.233Z",
+      "feature": "steps",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-10T07:52:25.427Z",
+      "feature": "steps",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-10T07:52:57.083Z",
+      "feature": "steps",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-10T07:53:04.367Z",
+      "feature": "service",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-10T07:59:51.818Z",
+      "feature": "steps",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-10T07:59:58.555Z",
+      "feature": "steps",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-10T08:00:06.354Z",
+      "feature": "steps",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-10T08:00:24.627Z",
+      "feature": "steps",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-10T08:02:38.134Z",
+      "feature": "steps",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-10T08:02:59.160Z",
+      "feature": "steps",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-10T10:04:21.514Z",
+      "feature": "util",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-10T10:04:37.499Z",
+      "feature": "util",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-10T10:04:43.570Z",
+      "feature": "api",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-10T10:18:30.922Z",
+      "feature": "util",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-10T10:18:46.624Z",
+      "feature": "service",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-10T10:18:56.231Z",
+      "feature": "service",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-11T05:21:51.336Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-11T05:32:04.298Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-11T05:32:15.768Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-11T05:50:20.530Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-11T06:50:58.156Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-12T14:29:56.728Z",
+      "feature": "python-llm-qa-skill",
+      "phase": "act",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-12T15:26:14.927Z",
+      "feature": ".claude",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-12T16:12:18.694Z",
+      "feature": "tmp",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-12T16:12:27.017Z",
+      "feature": "tmp",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-12T16:12:39.248Z",
+      "feature": "tmp",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-12T16:13:27.008Z",
+      "feature": "tmp",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T04:41:51.898Z",
+      "feature": "bin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T04:42:05.017Z",
+      "feature": "bin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T04:52:16.113Z",
+      "feature": "bin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T04:58:34.621Z",
+      "feature": "bin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T05:15:42.758Z",
+      "feature": "bin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T05:30:48.694Z",
+      "feature": "bin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T05:32:10.479Z",
+      "feature": "bin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T06:32:18.482Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T06:32:24.938Z",
+      "feature": "bin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-17T05:25:15.095Z",
+      "feature": "vpn-auto-switch-kit",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-17T05:43:47.484Z",
+      "feature": "vpn-auto-switch-kit",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-18T00:43:23.057Z",
+      "feature": ".claude",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-18T02:18:16.808Z",
+      "feature": "bin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-18T02:18:31.011Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-18T02:42:59.981Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-18T04:21:38.013Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-18T04:27:46.214Z",
+      "feature": ".zshrc.d",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-18T04:27:50.832Z",
+      "feature": ".zshrc.d",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-18T04:27:55.965Z",
+      "feature": ".zshrc.d",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-18T04:28:03.609Z",
+      "feature": ".zshrc.d",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-18T04:28:04.646Z",
+      "feature": ".zshrc.d",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-18T04:30:35.989Z",
+      "feature": ".zshrc.d",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-18T04:55:34.386Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-18T07:19:59.457Z",
+      "feature": "bin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-18T07:20:06.446Z",
+      "feature": "bin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-18T07:39:22.740Z",
+      "feature": "bin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-18T07:39:30.457Z",
+      "feature": "bin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-18T08:57:19.908Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-19T00:18:40.480Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-19T13:59:50.642Z",
+      "feature": "bin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-19T14:00:00.847Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-19T23:25:04.528Z",
+      "feature": "bin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-19T23:25:09.243Z",
+      "feature": "bin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-19T23:25:32.345Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-19T23:25:36.817Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-20T00:29:43.554Z",
+      "feature": "bin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-20T00:29:48.836Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-20T00:39:30.304Z",
+      "feature": "bin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-20T00:39:34.236Z",
+      "feature": "bin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-20T00:39:39.220Z",
+      "feature": "bin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-20T00:39:43.787Z",
+      "feature": "bin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-20T00:39:47.805Z",
+      "feature": "bin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-20T09:38:45.919Z",
+      "feature": ".claude",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-20T09:45:15.534Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-20T09:45:20.735Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-20T10:24:56.740Z",
+      "feature": "telegram-claude",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-20T10:25:20.253Z",
+      "feature": "telegram-claude",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-20T12:15:37.725Z",
+      "feature": "telegram-claude",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-20T12:23:28.266Z",
+      "feature": "slack-claude-session",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-20T12:25:01.992Z",
+      "feature": "slack-claude-session",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T12:07:54.443Z",
+      "feature": "slack-claude-session",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T12:08:00.206Z",
+      "feature": "slack-claude-session",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T12:08:05.224Z",
+      "feature": "slack-claude-session",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T12:50:00.074Z",
+      "feature": "domain",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T12:50:16.511Z",
+      "feature": "infrastructure",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T12:50:29.997Z",
+      "feature": "infrastructure",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T12:50:44.584Z",
+      "feature": "tests",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T12:50:54.487Z",
+      "feature": "tests",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T12:51:17.697Z",
+      "feature": "domain",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T12:51:27.668Z",
+      "feature": "controller",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T12:51:44.646Z",
+      "feature": "controller",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T12:52:03.770Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T12:52:24.715Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T12:52:37.767Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T12:52:45.940Z",
+      "feature": "git-dashboard",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T13:15:35.118Z",
+      "feature": "git-dashboard",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T13:15:54.113Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T13:16:00.928Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T13:16:06.898Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T13:42:42.184Z",
+      "feature": "controller",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T13:42:57.326Z",
+      "feature": "controller",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T13:43:25.152Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T13:43:34.388Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T13:43:45.166Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T13:43:50.638Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T13:43:56.942Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T13:48:44.359Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T13:49:36.888Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T13:50:01.588Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T13:59:43.602Z",
+      "feature": "infrastructure",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T14:00:06.205Z",
+      "feature": "domain",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T14:00:19.969Z",
+      "feature": "controller",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T14:00:28.592Z",
+      "feature": "controller",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T14:00:36.594Z",
+      "feature": "controller",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T14:00:44.943Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T14:00:52.983Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T14:01:00.130Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T14:01:05.851Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T14:01:13.580Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T14:01:37.574Z",
+      "feature": "domain",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T14:01:46.777Z",
+      "feature": "infrastructure",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T14:01:56.311Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T14:02:06.541Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T14:02:14.459Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T14:02:25.274Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T14:02:46.258Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T14:03:07.855Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T14:03:20.856Z",
+      "feature": "git-dashboard",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-30T14:03:50.740Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    }
+  ]
+}

@@ -95,8 +95,8 @@ class RepoSidebar(QWidget):
 
     def _load(self) -> None:
         self._list.clear()
-        active = self._controller._config.get_active_repo()
-        for repo in self._controller._config.get_repositories():
+        active = self._controller.get_active_repo()
+        for repo in self._controller.get_repositories():
             item = QListWidgetItem()
             status = self._status_cache.get(repo.path)
             dot, color = self._status_dot(status)
@@ -119,9 +119,7 @@ class RepoSidebar(QWidget):
         for i in range(self._list.count()):
             item = self._list.item(i)
             if item.data(Qt.ItemDataRole.UserRole) == path:
-                repo_name = self._controller._config.get_repositories()
-                # 이름 찾기
-                for r in self._controller._config.get_repositories():
+                for r in self._controller.get_repositories():
                     if r.path == path:
                         dot, color = self._status_dot(status)
                         item.setText(f"{dot}  {r.name}")

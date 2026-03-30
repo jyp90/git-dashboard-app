@@ -3,20 +3,24 @@ from __future__ import annotations
 
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
+    QDialog,
+    QDialogButtonBox,
     QFrame,
     QHBoxLayout,
+    QInputDialog,
     QLabel,
     QListWidget,
     QListWidgetItem,
     QPushButton,
     QScrollArea,
     QSizePolicy,
+    QTextEdit,
     QVBoxLayout,
     QWidget,
 )
 
 from app.controller.workflow_controller import WorkflowController
-from app.domain.models import BranchStatus, BranchSummary, Commit, SyncResult
+from app.domain.models import BranchResult, BranchStatus, BranchSummary, Commit, PrCheckReport, SyncResult
 
 
 class _Badge(QLabel):
@@ -204,17 +208,17 @@ class DashboardPanel(QWidget):
 
         self._pr_btn = _ActionButton("🔍  PR Check", "success")
         self._pr_btn.setToolTip("커밋 컨벤션, 파일 변경 수, TODO 잔존 검사")
-        self._pr_btn.setEnabled(False)  # Phase 2
+        self._pr_btn.clicked.connect(self._on_pr_check)
         row.addWidget(self._pr_btn)
 
         self._release_btn = _ActionButton("🚀  Release", "warning")
         self._release_btn.setToolTip("release/* 브랜치 생성 워크플로우")
-        self._release_btn.setEnabled(False)  # Phase 2
+        self._release_btn.clicked.connect(self._on_release)
         row.addWidget(self._release_btn)
 
         self._hotfix_btn = _ActionButton("🔥  Hotfix", "danger")
         self._hotfix_btn.setToolTip("hotfix/* 브랜치 생성 워크플로우")
-        self._hotfix_btn.setEnabled(False)  # Phase 2
+        self._hotfix_btn.clicked.connect(self._on_hotfix)
         row.addWidget(self._hotfix_btn)
 
         row.addStretch()
@@ -273,6 +277,8 @@ class DashboardPanel(QWidget):
         c = self._controller
         c.branch_summary_ready.connect(self._on_summary)
         c.sync_finished.connect(self._on_sync_result)
+        c.pr_check_ready.connect(self._on_pr_check_result)
+        c.branch_created.connect(self._on_branch_created)
         c.task_running.connect(self._on_busy)
 
     # ── 슬롯 ──────────────────────────────────────────────────────────────
@@ -304,11 +310,11 @@ class DashboardPanel(QWidget):
         self._load_commits()
 
     def _load_commits(self) -> None:
-        if not self._controller._repo:
+        if not self._controller.has_repository():
             return
         from app.controller.git_worker import GitWorker
         self._commit_worker = GitWorker(
-            lambda: self._controller._repo.get_commit_log(limit=12)
+            lambda: self._controller.get_commit_log(limit=12)
         )
         self._commit_worker.result_ready.connect(self._show_commits)
         self._commit_worker.start()
@@ -325,6 +331,80 @@ class DashboardPanel(QWidget):
         self._msg_label.setStyleSheet(f"color:{color}; font-size:12px; padding:4px 0;")
         self._msg_label.setText(result.message)
 
+    def _on_pr_check(self) -> None:
+        self._msg_label.setText("")
+        self._controller.run_pr_check()
+
+    def _on_pr_check_result(self, report: PrCheckReport) -> None:
+        _PrCheckDialog(report, self).exec()
+
+    def _on_release(self) -> None:
+        version, ok = QInputDialog.getText(
+            self, "Release 브랜치 생성", "버전 입력 (예: 1.2.0):"
+        )
+        if ok and version.strip():
+            self._msg_label.setText("")
+            self._controller.create_release_branch(version.strip())
+
+    def _on_hotfix(self) -> None:
+        issue_id, ok = QInputDialog.getText(
+            self, "Hotfix 브랜치 생성", "이슈 ID 또는 설명 입력 (예: fix-login-crash):"
+        )
+        if ok and issue_id.strip():
+            self._msg_label.setText("")
+            self._controller.create_hotfix_branch(issue_id.strip())
+
+    def _on_branch_created(self, result: BranchResult) -> None:
+        color = "#4ade80" if result.success else "#f87171"
+        self._msg_label.setStyleSheet(f"color:{color}; font-size:12px; padding:4px 0;")
+        self._msg_label.setText(result.message)
+        if result.success:
+            self._controller.refresh_branch_summary()
+
     def _on_busy(self, running: bool) -> None:
-        self._sync_btn.setEnabled(not running)
+        for btn in (self._sync_btn, self._pr_btn, self._release_btn, self._hotfix_btn):
+            btn.setEnabled(not running)
         self._sync_btn.setText("처리 중..." if running else "↻  Sync Develop")
+
+
+class _PrCheckDialog(QDialog):
+    """PR Check 결과 팝업."""
+
+    _ICON = {True: "✅", False: "❌"}
+    _CAT = {"convention": "커밋 컨벤션", "size": "변경 파일 수", "todo": "TODO 잔존"}
+
+    def __init__(self, report: PrCheckReport, parent=None) -> None:
+        super().__init__(parent)
+        self.setWindowTitle("PR Check 결과")
+        self.setMinimumWidth(520)
+        layout = QVBoxLayout(self)
+        layout.setSpacing(12)
+        layout.setContentsMargins(16, 16, 16, 16)
+
+        # 전체 결과 헤더
+        overall = "✅ PR 준비 완료" if report.passed else "❌ 수정 필요 항목 있음"
+        color = "#4ade80" if report.passed else "#f87171"
+        header = QLabel(f"<b>{overall}</b>   <span style='color:#64748b;font-size:12px'>{report.summary}</span>")
+        header.setStyleSheet(f"color:{color}; font-size:15px; padding:4px 0;")
+        header.setTextFormat(Qt.TextFormat.RichText)
+        layout.addWidget(header)
+
+        # 항목별 결과
+        result_text = QTextEdit()
+        result_text.setReadOnly(True)
+        result_text.setFixedHeight(160)
+        result_text.setStyleSheet(
+            "background:#141428; border-radius:8px; color:#94a3b8;"
+            "font-family:'SF Mono','Menlo',monospace; font-size:12px; padding:8px;"
+        )
+        lines = []
+        for item in report.items:
+            icon = self._ICON[item.passed]
+            cat = self._CAT.get(item.category, item.category)
+            lines.append(f"{icon}  [{cat}]  {item.message}")
+        result_text.setPlainText("\n".join(lines))
+        layout.addWidget(result_text)
+
+        btn_box = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok)
+        btn_box.accepted.connect(self.accept)
+        layout.addWidget(btn_box)

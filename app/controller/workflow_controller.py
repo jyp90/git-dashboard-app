@@ -5,7 +5,7 @@ from PyQt6.QtCore import QObject, pyqtSignal
 
 from app.controller.git_worker import GitWorker
 from app.domain.branch_manager import BranchManager
-from app.domain.models import BranchSummary, SyncResult, BranchResult
+from app.domain.models import BranchSummary, Commit, PrCheckReport, RepoConfig, SyncResult, BranchResult
 from app.infrastructure.config_store import ConfigStore
 from app.infrastructure.git_repository import GitRepository, GitRepositoryError
 
@@ -13,7 +13,7 @@ from app.infrastructure.git_repository import GitRepository, GitRepositoryError
 class WorkflowController(QObject):
     """UI 이벤트를 받아 Domain/Infrastructure를 호출하고 결과를 시그널로 방출.
 
-    UI는 이 컨트롤러의 시그널에만 연결 — Domain 직접 호출 금지.
+    UI는 이 컨트롤러의 공개 메서드와 시그널만 사용 — 내부 _repo/_config 직접 접근 금지.
     """
 
     # 브랜치 상태 업데이트
@@ -22,6 +22,8 @@ class WorkflowController(QObject):
     sync_finished = pyqtSignal(object)           # SyncResult
     # 브랜치 생성 완료
     branch_created = pyqtSignal(object)          # BranchResult
+    # PR 체크 완료
+    pr_check_ready = pyqtSignal(object)          # PrCheckReport
     # 에러
     error_occurred = pyqtSignal(str)
     # 작업 진행 중
@@ -66,6 +68,28 @@ class WorkflowController(QObject):
         self.task_running.emit(True)
         worker.finished.connect(lambda: self.task_running.emit(False))
         return worker
+
+    # ── 공개 Facade API (UI에서 _config/_repo 직접 접근 대체) ─────────────
+
+    def get_repositories(self) -> list[RepoConfig]:
+        """등록된 저장소 목록 반환."""
+        return self._config.get_repositories()
+
+    def get_active_repo(self) -> RepoConfig | None:
+        """현재 활성 저장소 반환."""
+        return self._config.get_active_repo()
+
+    def get_commit_log(self, limit: int = 20) -> list[Commit]:
+        """현재 저장소의 커밋 로그 반환."""
+        if not self._repo:
+            return []
+        return self._repo.get_commit_log(limit)
+
+    def has_repository(self) -> bool:
+        """활성 저장소가 있으면 True."""
+        return self._repo is not None
+
+    # ── 저장소 관리 ────────────────────────────────────────────────────────
 
     def add_repository(self, path: str, name: str) -> bool:
         """저장소 등록. 성공 시 True 반환."""
@@ -131,5 +155,19 @@ class WorkflowController(QObject):
         if worker is None:
             return
         worker.result_ready.connect(self.branch_created.emit)
+        worker.error_occurred.connect(self.error_occurred.emit)
+        worker.start()
+
+    def run_pr_check(self) -> None:
+        """PR 체크 비동기 실행."""
+        if not self._repo:
+            self.error_occurred.emit("저장소가 설정되지 않았습니다.")
+            return
+        from app.domain.pr_checker import PrChecker
+        checker = PrChecker(self._repo)
+        worker = self._run_task(checker.check)
+        if worker is None:
+            return
+        worker.result_ready.connect(self.pr_check_ready.emit)
         worker.error_occurred.connect(self.error_occurred.emit)
         worker.start()

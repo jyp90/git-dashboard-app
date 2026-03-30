@@ -56,10 +56,10 @@ class CommitLogPanel(QWidget):
         self._controller.branch_summary_ready.connect(lambda _: self._load_commits())
 
     def _load_commits(self) -> None:
-        if not self._controller._repo:
+        if not self._controller.has_repository():
             return
         from app.controller.git_worker import GitWorker
-        worker = GitWorker(lambda: self._controller._repo.get_commit_log(limit=20))
+        worker = GitWorker(lambda: self._controller.get_commit_log(limit=20))
         worker.result_ready.connect(self._show_commits)
         worker.start()
         # worker 참조 유지 (GC 방지)

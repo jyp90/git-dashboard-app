@@ -4,11 +4,12 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-from PyQt6.QtWidgets import QApplication
+from PyQt6.QtWidgets import QApplication, QSystemTrayIcon
 
 from app.controller.workflow_controller import WorkflowController
 from app.infrastructure.config_store import ConfigStore
 from app.ui.main_window import MainWindow
+from app.ui.menu_bar_app import MenuBarApp
 
 
 def _load_stylesheet() -> str:
@@ -23,6 +24,9 @@ def main() -> None:
     app.setApplicationName("Git Dashboard")
     app.setOrganizationName("jypark")
 
+    # 윈도우 닫아도 트레이에 상주
+    app.setQuitOnLastWindowClosed(False)
+
     # 다크 테마 적용
     stylesheet = _load_stylesheet()
     if stylesheet:
@@ -31,6 +35,10 @@ def main() -> None:
     config = ConfigStore()
     controller = WorkflowController(config)
     window = MainWindow(controller)
+
+    # 메뉴바 트레이 초기화 (시스템 트레이 지원 시)
+    tray_app = MenuBarApp(controller, window)
+
     window.show()
 
     sys.exit(app.exec())

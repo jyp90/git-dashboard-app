@@ -1,0 +1,1 @@
+- [Project Context](project_git_dashboard.md) -- macOS Git Workflow GUI Dashboard, PyQt6 4-Layer arch, 4-week PDCA plan
