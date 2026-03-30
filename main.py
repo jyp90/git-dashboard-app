@@ -12,8 +12,16 @@ from app.ui.main_window import MainWindow
 from app.ui.menu_bar_app import MenuBarApp
 
 
+def _resource_base() -> Path:
+    """PyInstaller 번들 환경과 개발 환경 모두에서 리소스 루트 경로 반환."""
+    if getattr(sys, "frozen", False):
+        # PyInstaller .app 번들 내부: _MEIPASS 기준
+        return Path(sys._MEIPASS)  # type: ignore[attr-defined]
+    return Path(__file__).parent
+
+
 def _load_stylesheet() -> str:
-    qss_path = Path(__file__).parent / "resources" / "styles" / "dark_theme.qss"
+    qss_path = _resource_base() / "resources" / "styles" / "dark_theme.qss"
     if qss_path.exists():
         return qss_path.read_text(encoding="utf-8")
     return ""

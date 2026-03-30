@@ -13,9 +13,7 @@ build/
 # Poetry
 poetry.lock
 
-# PyInstaller
-*.spec
-dist/
+# PyInstaller — git_dashboard.spec 은 커밋, 빌드 산출물만 제외
 
 # pytest / coverage
 .pytest_cache/
