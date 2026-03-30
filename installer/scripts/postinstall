@@ -1,0 +1,11 @@
+#!/bin/bash
+# postinstall — 설치 후 실행 스크립트
+# /Applications 에 복사된 앱의 quarantine 속성 제거 (Gatekeeper 경고 방지)
+
+APP="/Applications/Git Dashboard.app"
+
+if [ -d "$APP" ]; then
+    xattr -rd com.apple.quarantine "$APP" 2>/dev/null || true
+fi
+
+exit 0
