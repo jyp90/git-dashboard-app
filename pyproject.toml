@@ -1,0 +1,34 @@
+[tool.poetry]
+name = "git-dashboard"
+version = "0.1.0"
+description = "macOS Git Workflow GUI Dashboard"
+authors = ["jypark"]
+readme = "README.md"
+packages = [{include = "app"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+PyQt6 = "^6.6"
+GitPython = "^3.1"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0"
+pytest-cov = "^4.0"
+black = "^24.0"
+
+# pyinstaller: Python 3.14 미지원 → Phase 3(W4) 패키징 단계에서 별도 설치
+
+[tool.poetry.scripts]
+git-dashboard = "main:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 88
+target-version = ["py311"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --cov=app --cov-report=term-missing"

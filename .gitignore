@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+dist/
+build/
+*.egg-info/
+
+# Poetry
+poetry.lock
+
+# PyInstaller
+*.spec
+dist/
+
+# pytest / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# macOS
+.DS_Store
+*.DS_Store
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# App config (사용자별)
+~/.git-dashboard/
+
+# bkit 내부 상태 (커밋 제외)
+.bkit/runtime/
+.bkit/snapshots/

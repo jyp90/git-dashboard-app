@@ -1,0 +1,1480 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git Dashboard - Project Plan</title>
+    <style>
+        /* Reset & Base */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --bg-card: #1c2128;
+            --border: #30363d;
+            --border-light: #3d444d;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --text-muted: #6e7681;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-orange: #d29922;
+            --accent-red: #f85149;
+            --accent-purple: #bc8cff;
+            --accent-pink: #f778ba;
+            --phase-mvp: #f85149;
+            --phase-workflow: #d29922;
+            --phase-polish: #3fb950;
+            --phase-package: #58a6ff;
+            --shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+            --radius: 12px;
+            --radius-sm: 8px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #161b22 0%, #0d1117 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 2rem 0;
+        }
+
+        .header-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header h1 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .header h1 span {
+            color: var(--accent-blue);
+        }
+
+        .header-meta {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .header-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            border: 1px solid var(--border);
+            background: var(--bg-tertiary);
+        }
+
+        .header-badge.status { border-color: var(--accent-green); color: var(--accent-green); }
+        .header-badge.stack { border-color: var(--accent-blue); color: var(--accent-blue); }
+        .header-badge.date { border-color: var(--text-muted); color: var(--text-secondary); }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Section Headers */
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 1.2rem;
+            border-radius: 2px;
+            background: var(--accent-blue);
+        }
+
+        /* Overview Cards */
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .overview-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+
+        .overview-card:hover {
+            border-color: var(--border-light);
+            transform: translateY(-2px);
+        }
+
+        .overview-card .label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .overview-card .value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .overview-card .sub {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        .overview-card .value.green { color: var(--accent-green); }
+        .overview-card .value.blue { color: var(--accent-blue); }
+        .overview-card .value.orange { color: var(--accent-orange); }
+        .overview-card .value.purple { color: var(--accent-purple); }
+
+        /* Architecture Section */
+        .arch-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .arch-layers {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .arch-layer {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .arch-layer:hover { border-color: var(--border-light); }
+
+        .arch-layer .layer-num {
+            font-size: 0.7rem;
+            font-weight: 700;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .arch-layer.l4 .layer-num { background: rgba(88, 166, 255, 0.15); color: var(--accent-blue); }
+        .arch-layer.l3 .layer-num { background: rgba(210, 153, 34, 0.15); color: var(--accent-orange); }
+        .arch-layer.l2 .layer-num { background: rgba(63, 185, 80, 0.15); color: var(--accent-green); }
+        .arch-layer.l1 .layer-num { background: rgba(188, 140, 255, 0.15); color: var(--accent-purple); }
+
+        .arch-layer .layer-name {
+            font-weight: 600;
+            min-width: 120px;
+        }
+
+        .arch-layer .layer-classes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+
+        .class-tag {
+            padding: 0.15rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            border: 1px solid;
+        }
+
+        .arch-layer.l4 .class-tag { background: rgba(88,166,255,0.08); border-color: rgba(88,166,255,0.3); color: #79c0ff; }
+        .arch-layer.l3 .class-tag { background: rgba(210,153,34,0.08); border-color: rgba(210,153,34,0.3); color: #e3b341; }
+        .arch-layer.l2 .class-tag { background: rgba(63,185,80,0.08); border-color: rgba(63,185,80,0.3); color: #56d364; }
+        .arch-layer.l1 .class-tag { background: rgba(188,140,255,0.08); border-color: rgba(188,140,255,0.3); color: #d2a8ff; }
+
+        .arch-arrow {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            padding: 0.15rem 0;
+        }
+
+        /* Feature Cards Grid */
+        .feature-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .phase-group {
+            margin-bottom: 2rem;
+        }
+
+        .phase-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .phase-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .phase-dot.mvp { background: var(--phase-mvp); }
+        .phase-dot.workflow { background: var(--phase-workflow); }
+        .phase-dot.polish { background: var(--phase-polish); }
+        .phase-dot.package { background: var(--phase-package); }
+
+        .phase-label {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .phase-count {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            background: var(--bg-tertiary);
+            padding: 0.15rem 0.5rem;
+            border-radius: 10px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.2s, transform 0.15s;
+        }
+
+        .feature-card:hover {
+            border-color: var(--border-light);
+            transform: translateY(-1px);
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+
+        .feature-card.mvp::before { background: var(--phase-mvp); }
+        .feature-card.workflow::before { background: var(--phase-workflow); }
+        .feature-card.polish::before { background: var(--phase-polish); }
+        .feature-card.package::before { background: var(--phase-package); }
+
+        .feature-id {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.4rem;
+        }
+
+        .feature-card.mvp .feature-id { color: var(--phase-mvp); }
+        .feature-card.workflow .feature-id { color: var(--phase-workflow); }
+        .feature-card.polish .feature-id { color: var(--phase-polish); }
+        .feature-card.package .feature-id { color: var(--phase-package); }
+
+        .feature-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.35rem;
+            color: var(--text-primary);
+        }
+
+        .feature-desc {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+            margin-bottom: 0.6rem;
+        }
+
+        .feature-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .feature-complexity {
+            font-size: 0.7rem;
+            padding: 0.1rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .complexity-low { background: rgba(63,185,80,0.15); color: var(--accent-green); }
+        .complexity-medium { background: rgba(210,153,34,0.15); color: var(--accent-orange); }
+        .complexity-high { background: rgba(248,81,73,0.15); color: var(--accent-red); }
+
+        .feature-days {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .feature-priority {
+            font-size: 0.65rem;
+            padding: 0.1rem 0.4rem;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+
+        .priority-critical { background: rgba(248,81,73,0.15); color: var(--accent-red); }
+        .priority-high { background: rgba(210,153,34,0.15); color: var(--accent-orange); }
+        .priority-medium { background: rgba(88,166,255,0.15); color: var(--accent-blue); }
+        .priority-low { background: rgba(139,148,158,0.15); color: var(--text-secondary); }
+
+        /* Timeline */
+        .timeline-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .timeline {
+            position: relative;
+            padding: 1rem 0;
+        }
+
+        .timeline-track {
+            position: relative;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            overflow-x: auto;
+        }
+
+        .timeline-header {
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            gap: 0;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-days-header {
+            display: grid;
+            grid-template-columns: repeat(20, 1fr);
+            gap: 2px;
+        }
+
+        .day-label {
+            text-align: center;
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            padding: 0.25rem 0;
+        }
+
+        .timeline-row {
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            gap: 0;
+            align-items: center;
+            margin-bottom: 0.35rem;
+        }
+
+        .timeline-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            padding-right: 1rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .timeline-bars {
+            display: grid;
+            grid-template-columns: repeat(20, 1fr);
+            gap: 2px;
+            height: 22px;
+        }
+
+        .bar-cell {
+            border-radius: 3px;
+        }
+
+        .bar-mvp { background: var(--phase-mvp); opacity: 0.8; }
+        .bar-workflow { background: var(--phase-workflow); opacity: 0.8; }
+        .bar-polish { background: var(--phase-polish); opacity: 0.8; }
+        .bar-package { background: var(--phase-package); opacity: 0.8; }
+
+        .bar-cell:hover { opacity: 1; }
+
+        .timeline-week-markers {
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            margin-top: 0.5rem;
+        }
+
+        .week-markers {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .week-marker {
+            text-align: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.3rem;
+            border-radius: 4px;
+            margin: 0 2px;
+        }
+
+        .week-marker.w1 { background: rgba(248,81,73,0.12); color: var(--phase-mvp); }
+        .week-marker.w2 { background: rgba(210,153,34,0.12); color: var(--phase-workflow); }
+        .week-marker.w3 { background: rgba(63,185,80,0.12); color: var(--phase-polish); }
+        .week-marker.w4 { background: rgba(88,166,255,0.12); color: var(--phase-package); }
+
+        /* Dependency Table */
+        .dep-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .dep-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .dep-table th {
+            background: var(--bg-tertiary);
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .dep-table td {
+            padding: 0.6rem 1rem;
+            font-size: 0.8rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        .dep-table tr:last-child td { border-bottom: none; }
+
+        .dep-table tr:hover td { background: rgba(88,166,255,0.04); }
+
+        .dep-table .file-name {
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            color: var(--accent-blue);
+            font-size: 0.8rem;
+        }
+
+        .dep-table .layer-badge {
+            display: inline-block;
+            padding: 0.1rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .layer-infra { background: rgba(188,140,255,0.15); color: var(--accent-purple); }
+        .layer-domain { background: rgba(63,185,80,0.15); color: var(--accent-green); }
+        .layer-app { background: rgba(210,153,34,0.15); color: var(--accent-orange); }
+        .layer-ui { background: rgba(88,166,255,0.15); color: var(--accent-blue); }
+
+        /* Test Stats */
+        .test-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+
+        .test-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+        }
+
+        .test-card .test-layer {
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .test-card .test-count {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .test-card .test-count span {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .test-bar {
+            height: 4px;
+            border-radius: 2px;
+            background: var(--bg-tertiary);
+            margin-top: 0.75rem;
+            overflow: hidden;
+        }
+
+        .test-bar-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.3s;
+        }
+
+        .test-target {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 0.35rem;
+            text-align: right;
+        }
+
+        /* Risks */
+        .risk-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .risk-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+
+        .risk-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .risk-level {
+            width: 4px;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        .risk-high { background: var(--accent-red); }
+        .risk-medium { background: var(--accent-orange); }
+        .risk-low { background: var(--accent-green); }
+
+        .risk-content { flex: 1; }
+
+        .risk-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .risk-desc {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .risk-mitigation {
+            font-size: 0.72rem;
+            color: var(--accent-blue);
+            margin-top: 0.35rem;
+        }
+
+        /* Footer */
+        .footer {
+            border-top: 1px solid var(--border);
+            padding: 1.5rem 0;
+            margin-top: 2rem;
+        }
+
+        .footer-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-text {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .footer-link {
+            font-size: 0.75rem;
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .overview-grid { grid-template-columns: repeat(2, 1fr); }
+            .feature-grid { grid-template-columns: repeat(2, 1fr); }
+            .test-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            .overview-grid { grid-template-columns: 1fr; }
+            .feature-grid { grid-template-columns: 1fr; }
+            .test-grid { grid-template-columns: 1fr; }
+            .risk-grid { grid-template-columns: 1fr; }
+            .header-inner { flex-direction: column; gap: 1rem; align-items: flex-start; }
+            .header-meta { flex-wrap: wrap; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+    <div class="header-inner">
+        <h1><span>Git Dashboard</span> &mdash; Project Plan</h1>
+        <div class="header-meta">
+            <span class="header-badge status">&#9679; Planning</span>
+            <span class="header-badge stack">Python 3.11 / PyQt6</span>
+            <span class="header-badge date">2026-03-30</span>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+
+    <!-- Overview Cards -->
+    <div class="overview-grid">
+        <div class="overview-card">
+            <div class="label">Features</div>
+            <div class="value blue">12</div>
+            <div class="sub">F-01 ~ F-12</div>
+        </div>
+        <div class="overview-card">
+            <div class="label">Duration</div>
+            <div class="value orange">4 Weeks</div>
+            <div class="sub">20 Working Days</div>
+        </div>
+        <div class="overview-card">
+            <div class="label">Test Cases</div>
+            <div class="value green">45</div>
+            <div class="sub">21 Infra + 19 Domain + 5 App</div>
+        </div>
+        <div class="overview-card">
+            <div class="label">Architecture</div>
+            <div class="value purple">4-Layer</div>
+            <div class="sub">Infra / Domain / App / UI</div>
+        </div>
+    </div>
+
+    <!-- Architecture -->
+    <section class="arch-section">
+        <h2 class="section-title">4-Layer Architecture</h2>
+        <div class="arch-layers">
+            <div class="arch-layer l4">
+                <div class="layer-num">L4</div>
+                <div class="layer-name">Presentation</div>
+                <div class="layer-classes">
+                    <span class="class-tag">MainWindow</span>
+                    <span class="class-tag">BranchPanel</span>
+                    <span class="class-tag">CommitLogPanel</span>
+                    <span class="class-tag">WorkflowPanel</span>
+                    <span class="class-tag">PrCheckPanel</span>
+                    <span class="class-tag">MenuBarApp</span>
+                </div>
+            </div>
+            <div class="arch-arrow">&#8595; Signal / Slot</div>
+            <div class="arch-layer l3">
+                <div class="layer-num">L3</div>
+                <div class="layer-name">Application</div>
+                <div class="layer-classes">
+                    <span class="class-tag">WorkflowController</span>
+                    <span class="class-tag">GitWorker (QThread)</span>
+                </div>
+            </div>
+            <div class="arch-arrow">&#8595; Method Call</div>
+            <div class="arch-layer l2">
+                <div class="layer-num">L2</div>
+                <div class="layer-name">Domain</div>
+                <div class="layer-classes">
+                    <span class="class-tag">models.py</span>
+                    <span class="class-tag">BranchManager</span>
+                    <span class="class-tag">CommitAnalyzer</span>
+                    <span class="class-tag">PrChecker</span>
+                    <span class="class-tag">ReleaseManager</span>
+                </div>
+            </div>
+            <div class="arch-arrow">&#8595; Dependency Injection</div>
+            <div class="arch-layer l1">
+                <div class="layer-num">L1</div>
+                <div class="layer-name">Infrastructure</div>
+                <div class="layer-classes">
+                    <span class="class-tag">GitRepository</span>
+                    <span class="class-tag">ScriptRunner</span>
+                    <span class="class-tag">ConfigStore</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Feature Cards -->
+    <section class="feature-section">
+        <h2 class="section-title">Features (F-01 ~ F-12)</h2>
+
+        <!-- Phase 1: MVP -->
+        <div class="phase-group">
+            <div class="phase-header">
+                <div class="phase-dot mvp"></div>
+                <span class="phase-label">Phase 1: MVP (Week 1)</span>
+                <span class="phase-count">4 features / 5 days</span>
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card mvp">
+                    <div class="feature-id">F-01</div>
+                    <div class="feature-name">Branch Status Panel</div>
+                    <div class="feature-desc">Current branch, ahead/behind count, dirty state badge. Real-time branch status visualization.</div>
+                    <div class="feature-meta">
+                        <span class="feature-priority priority-critical">Critical</span>
+                        <span class="feature-complexity complexity-medium">Medium</span>
+                        <span class="feature-days">1.5d</span>
+                    </div>
+                </div>
+                <div class="feature-card mvp">
+                    <div class="feature-id">F-02</div>
+                    <div class="feature-name">One-Click Branch Sync</div>
+                    <div class="feature-desc">develop &larr; origin sync via ScriptRunner wrapping branch_sync.sh. QThread required.</div>
+                    <div class="feature-meta">
+                        <span class="feature-priority priority-critical">Critical</span>
+                        <span class="feature-complexity complexity-low">Low</span>
+                        <span class="feature-days">0.5d</span>
+                    </div>
+                </div>
+                <div class="feature-card mvp">
+                    <div class="feature-id">F-03</div>
+                    <div class="feature-name">Commit Log Viewer</div>
+                    <div class="feature-desc">Recent 20 commits: hash, message, author, date. QTableWidget with search filter.</div>
+                    <div class="feature-meta">
+                        <span class="feature-priority priority-high">High</span>
+                        <span class="feature-complexity complexity-low">Low</span>
+                        <span class="feature-days">1d</span>
+                    </div>
+                </div>
+                <div class="feature-card mvp">
+                    <div class="feature-id">F-04</div>
+                    <div class="feature-name">Branch List</div>
+                    <div class="feature-desc">Local/remote branch tree view. QTreeWidget inside BranchStatusPanel.</div>
+                    <div class="feature-meta">
+                        <span class="feature-priority priority-high">High</span>
+                        <span class="feature-complexity complexity-low">Low</span>
+                        <span class="feature-days">0.5d</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Phase 2: Workflow -->
+        <div class="phase-group">
+            <div class="phase-header">
+                <div class="phase-dot workflow"></div>
+                <span class="phase-label">Phase 2: Workflow (Week 2-3)</span>
+                <span class="phase-count">4 features / 10 days</span>
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card workflow">
+                    <div class="feature-id">F-05</div>
+                    <div class="feature-name">PR Quality Checker</div>
+                    <div class="feature-desc">Commit convention, file change count, TODO detection. PrCheckReport generation.</div>
+                    <div class="feature-meta">
+                        <span class="feature-priority priority-high">High</span>
+                        <span class="feature-complexity complexity-high">High</span>
+                        <span class="feature-days">2d</span>
+                    </div>
+                </div>
+                <div class="feature-card workflow">
+                    <div class="feature-id">F-06</div>
+                    <div class="feature-name">Release Workflow</div>
+                    <div class="feature-desc">release/* branch &rarr; version tag &rarr; main merge. Multi-step wizard UI with rollback.</div>
+                    <div class="feature-meta">
+                        <span class="feature-priority priority-high">High</span>
+                        <span class="feature-complexity complexity-high">High</span>
+                        <span class="feature-days">2d</span>
+                    </div>
+                </div>
+                <div class="feature-card workflow">
+                    <div class="feature-id">F-07</div>
+                    <div class="feature-name">Hotfix Workflow</div>
+                    <div class="feature-desc">hotfix/* branch &rarr; patch &rarr; develop + main merge. Dual-target propagation.</div>
+                    <div class="feature-meta">
+                        <span class="feature-priority priority-medium">Medium</span>
+                        <span class="feature-complexity complexity-medium">Medium</span>
+                        <span class="feature-days">1d</span>
+                    </div>
+                </div>
+                <div class="feature-card workflow">
+                    <div class="feature-id">F-08</div>
+                    <div class="feature-name">Menu Bar (System Tray)</div>
+                    <div class="feature-desc">macOS menu bar resident icon via QSystemTrayIcon. Quick access to core actions.</div>
+                    <div class="feature-meta">
+                        <span class="feature-priority priority-high">High</span>
+                        <span class="feature-complexity complexity-high">High</span>
+                        <span class="feature-days">1.5d</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Phase 3: Polish + Package -->
+        <div class="phase-group">
+            <div class="phase-header">
+                <div class="phase-dot polish"></div>
+                <span class="phase-label">Phase 3: Polish &amp; Package (Week 4)</span>
+                <span class="phase-count">4 features / 5 days</span>
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card polish">
+                    <div class="feature-id">F-09</div>
+                    <div class="feature-name">Multi-Repository</div>
+                    <div class="feature-desc">Tab switching for multiple projects (aipd, community, citeasy). ConfigStore extension.</div>
+                    <div class="feature-meta">
+                        <span class="feature-priority priority-medium">Medium</span>
+                        <span class="feature-complexity complexity-medium">Medium</span>
+                        <span class="feature-days">2d</span>
+                    </div>
+                </div>
+                <div class="feature-card polish">
+                    <div class="feature-id">F-10</div>
+                    <div class="feature-name">Pre-push Hook Visual</div>
+                    <div class="feature-desc">Hook execution results displayed in UI. Log viewer for hook output.</div>
+                    <div class="feature-meta">
+                        <span class="feature-priority priority-low">Low</span>
+                        <span class="feature-complexity complexity-medium">Medium</span>
+                        <span class="feature-days">1d</span>
+                    </div>
+                </div>
+                <div class="feature-card package">
+                    <div class="feature-id">F-11</div>
+                    <div class="feature-name">macOS Notifications</div>
+                    <div class="feature-desc">Branch behind, merge conflict risk alerts via macOS Notification Center.</div>
+                    <div class="feature-meta">
+                        <span class="feature-priority priority-low">Low</span>
+                        <span class="feature-complexity complexity-low">Low</span>
+                        <span class="feature-days">0.5d</span>
+                    </div>
+                </div>
+                <div class="feature-card package">
+                    <div class="feature-id">F-12</div>
+                    <div class="feature-name">.app Packaging</div>
+                    <div class="feature-desc">PyInstaller &rarr; standalone .app bundle. Target: under 100MB with all dependencies.</div>
+                    <div class="feature-meta">
+                        <span class="feature-priority priority-high">High</span>
+                        <span class="feature-complexity complexity-high">High</span>
+                        <span class="feature-days">2d</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Timeline -->
+    <section class="timeline-section">
+        <h2 class="section-title">Development Timeline (20 Days)</h2>
+        <div class="timeline-track">
+            <!-- Day headers -->
+            <div class="timeline-header">
+                <div></div>
+                <div class="timeline-days-header">
+                    <div class="day-label">D1</div><div class="day-label">D2</div><div class="day-label">D3</div>
+                    <div class="day-label">D4</div><div class="day-label">D5</div><div class="day-label">D6</div>
+                    <div class="day-label">D7</div><div class="day-label">D8</div><div class="day-label">D9</div>
+                    <div class="day-label">D10</div><div class="day-label">D11</div><div class="day-label">D12</div>
+                    <div class="day-label">D13</div><div class="day-label">D14</div><div class="day-label">D15</div>
+                    <div class="day-label">D16</div><div class="day-label">D17</div><div class="day-label">D18</div>
+                    <div class="day-label">D19</div><div class="day-label">D20</div>
+                </div>
+            </div>
+
+            <!-- Infrastructure -->
+            <div class="timeline-row">
+                <div class="timeline-label">git_repository.py</div>
+                <div class="timeline-bars">
+                    <div class="bar-cell bar-mvp"></div><div class="bar-cell bar-mvp"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                </div>
+            </div>
+            <div class="timeline-row">
+                <div class="timeline-label">config_store.py</div>
+                <div class="timeline-bars">
+                    <div class="bar-cell"></div><div class="bar-cell bar-mvp"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell bar-package"></div><div class="bar-cell bar-package"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                </div>
+            </div>
+            <div class="timeline-row">
+                <div class="timeline-label">script_runner.py</div>
+                <div class="timeline-bars">
+                    <div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell bar-mvp"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell bar-workflow"></div><div class="bar-cell bar-workflow"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div>
+                </div>
+            </div>
+
+            <!-- Domain -->
+            <div class="timeline-row">
+                <div class="timeline-label">models.py</div>
+                <div class="timeline-bars">
+                    <div class="bar-cell bar-mvp"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                </div>
+            </div>
+            <div class="timeline-row">
+                <div class="timeline-label">branch_manager.py</div>
+                <div class="timeline-bars">
+                    <div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell bar-mvp"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                </div>
+            </div>
+            <div class="timeline-row">
+                <div class="timeline-label">pr_checker.py</div>
+                <div class="timeline-bars">
+                    <div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell bar-workflow"></div><div class="bar-cell bar-workflow"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell bar-polish"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                </div>
+            </div>
+            <div class="timeline-row">
+                <div class="timeline-label">release_manager.py</div>
+                <div class="timeline-bars">
+                    <div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell bar-workflow"></div><div class="bar-cell bar-workflow"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div>
+                </div>
+            </div>
+
+            <!-- Application -->
+            <div class="timeline-row">
+                <div class="timeline-label">git_worker.py</div>
+                <div class="timeline-bars">
+                    <div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell bar-mvp"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                </div>
+            </div>
+            <div class="timeline-row">
+                <div class="timeline-label">workflow_controller.py</div>
+                <div class="timeline-bars">
+                    <div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell bar-mvp"></div><div class="bar-cell bar-mvp"></div>
+                    <div class="bar-cell"></div><div class="bar-cell bar-workflow"></div>
+                    <div class="bar-cell"></div><div class="bar-cell bar-workflow"></div><div class="bar-cell bar-workflow"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div>
+                </div>
+            </div>
+
+            <!-- Presentation -->
+            <div class="timeline-row">
+                <div class="timeline-label">main_window.py</div>
+                <div class="timeline-bars">
+                    <div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell bar-mvp"></div><div class="bar-cell bar-mvp"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell bar-package"></div><div class="bar-cell bar-package"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                </div>
+            </div>
+            <div class="timeline-row">
+                <div class="timeline-label">branch_panel.py</div>
+                <div class="timeline-bars">
+                    <div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell bar-mvp"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                </div>
+            </div>
+            <div class="timeline-row">
+                <div class="timeline-label">commit_log_panel.py</div>
+                <div class="timeline-bars">
+                    <div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell bar-mvp"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell bar-workflow"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                </div>
+            </div>
+            <div class="timeline-row">
+                <div class="timeline-label">pr_check_panel.py</div>
+                <div class="timeline-bars">
+                    <div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell bar-workflow"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell bar-polish"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                </div>
+            </div>
+            <div class="timeline-row">
+                <div class="timeline-label">workflow_panel.py</div>
+                <div class="timeline-bars">
+                    <div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell bar-workflow"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div>
+                </div>
+            </div>
+            <div class="timeline-row">
+                <div class="timeline-label">menu_bar_app.py</div>
+                <div class="timeline-bars">
+                    <div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell bar-polish"></div><div class="bar-cell bar-polish"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div>
+                </div>
+            </div>
+            <div class="timeline-row">
+                <div class="timeline-label">dark_theme.qss</div>
+                <div class="timeline-bars">
+                    <div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell bar-polish"></div><div class="bar-cell bar-polish"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                </div>
+            </div>
+            <div class="timeline-row">
+                <div class="timeline-label">PyInstaller .spec</div>
+                <div class="timeline-bars">
+                    <div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell"></div><div class="bar-cell"></div>
+                    <div class="bar-cell"></div><div class="bar-cell bar-package"></div><div class="bar-cell bar-package"></div>
+                </div>
+            </div>
+
+            <!-- Week markers -->
+            <div class="timeline-week-markers">
+                <div></div>
+                <div class="week-markers">
+                    <div class="week-marker w1">Week 1: MVP</div>
+                    <div class="week-marker w2">Week 2: Workflow</div>
+                    <div class="week-marker w3">Week 3: Polish</div>
+                    <div class="week-marker w4">Week 4: Package</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Implementation Order -->
+    <section class="dep-section">
+        <h2 class="section-title">Implementation Order (Bottom-Up)</h2>
+        <table class="dep-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>File</th>
+                    <th>Layer</th>
+                    <th>Class</th>
+                    <th>Day</th>
+                    <th>Dependencies</th>
+                    <th>Feature</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td class="file-name">models.py</td>
+                    <td><span class="layer-badge layer-domain">Domain</span></td>
+                    <td>dataclasses</td>
+                    <td>D1</td>
+                    <td>None</td>
+                    <td>All</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td class="file-name">git_repository.py</td>
+                    <td><span class="layer-badge layer-infra">Infra</span></td>
+                    <td>GitRepository</td>
+                    <td>D1-D2</td>
+                    <td>models.py, GitPython</td>
+                    <td>F-01~F-04</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td class="file-name">config_store.py</td>
+                    <td><span class="layer-badge layer-infra">Infra</span></td>
+                    <td>ConfigStore</td>
+                    <td>D2</td>
+                    <td>models.py</td>
+                    <td>F-09</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td class="file-name">script_runner.py</td>
+                    <td><span class="layer-badge layer-infra">Infra</span></td>
+                    <td>ScriptRunner</td>
+                    <td>D3, D6-7</td>
+                    <td>models.py</td>
+                    <td>F-02, F-06, F-07</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td class="file-name">branch_manager.py</td>
+                    <td><span class="layer-badge layer-domain">Domain</span></td>
+                    <td>BranchManager</td>
+                    <td>D3</td>
+                    <td>GitRepository, ScriptRunner</td>
+                    <td>F-01, F-02</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td class="file-name">commit_analyzer.py</td>
+                    <td><span class="layer-badge layer-domain">Domain</span></td>
+                    <td>CommitAnalyzer</td>
+                    <td>D3</td>
+                    <td>GitRepository</td>
+                    <td>F-03</td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td class="file-name">git_worker.py</td>
+                    <td><span class="layer-badge layer-app">App</span></td>
+                    <td>GitWorker</td>
+                    <td>D4</td>
+                    <td>PyQt6 QThread</td>
+                    <td>All async</td>
+                </tr>
+                <tr>
+                    <td>8</td>
+                    <td class="file-name">workflow_controller.py</td>
+                    <td><span class="layer-badge layer-app">App</span></td>
+                    <td>WorkflowController</td>
+                    <td>D4-5</td>
+                    <td>All Domain + GitWorker</td>
+                    <td>All</td>
+                </tr>
+                <tr>
+                    <td>9</td>
+                    <td class="file-name">main_window.py</td>
+                    <td><span class="layer-badge layer-ui">UI</span></td>
+                    <td>MainWindow</td>
+                    <td>D4-5</td>
+                    <td>WorkflowController</td>
+                    <td>All</td>
+                </tr>
+                <tr>
+                    <td>10</td>
+                    <td class="file-name">branch_panel.py</td>
+                    <td><span class="layer-badge layer-ui">UI</span></td>
+                    <td>BranchStatusPanel</td>
+                    <td>D4</td>
+                    <td>WorkflowController</td>
+                    <td>F-01, F-02, F-04</td>
+                </tr>
+                <tr>
+                    <td>11</td>
+                    <td class="file-name">commit_log_panel.py</td>
+                    <td><span class="layer-badge layer-ui">UI</span></td>
+                    <td>CommitLogPanel</td>
+                    <td>D4, D8</td>
+                    <td>WorkflowController</td>
+                    <td>F-03</td>
+                </tr>
+                <tr>
+                    <td>12</td>
+                    <td class="file-name">pr_checker.py</td>
+                    <td><span class="layer-badge layer-domain">Domain</span></td>
+                    <td>PrChecker</td>
+                    <td>D7-8</td>
+                    <td>GitRepository</td>
+                    <td>F-05</td>
+                </tr>
+                <tr>
+                    <td>13</td>
+                    <td class="file-name">release_manager.py</td>
+                    <td><span class="layer-badge layer-domain">Domain</span></td>
+                    <td>ReleaseManager</td>
+                    <td>D9</td>
+                    <td>GitRepository, ScriptRunner, BranchManager</td>
+                    <td>F-06, F-07</td>
+                </tr>
+                <tr>
+                    <td>14</td>
+                    <td class="file-name">pr_check_panel.py</td>
+                    <td><span class="layer-badge layer-ui">UI</span></td>
+                    <td>PrCheckPanel</td>
+                    <td>D8, D11</td>
+                    <td>WorkflowController</td>
+                    <td>F-05</td>
+                </tr>
+                <tr>
+                    <td>15</td>
+                    <td class="file-name">workflow_panel.py</td>
+                    <td><span class="layer-badge layer-ui">UI</span></td>
+                    <td>WorkflowPanel</td>
+                    <td>D10</td>
+                    <td>WorkflowController</td>
+                    <td>F-06, F-07</td>
+                </tr>
+                <tr>
+                    <td>16</td>
+                    <td class="file-name">menu_bar_app.py</td>
+                    <td><span class="layer-badge layer-ui">UI</span></td>
+                    <td>MenuBarApp</td>
+                    <td>D12-13</td>
+                    <td>WorkflowController, QSystemTrayIcon</td>
+                    <td>F-08</td>
+                </tr>
+                <tr>
+                    <td>17</td>
+                    <td class="file-name">dark_theme.qss</td>
+                    <td><span class="layer-badge layer-ui">UI</span></td>
+                    <td>Stylesheet</td>
+                    <td>D13-14</td>
+                    <td>All UI widgets</td>
+                    <td>All UI</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- Test Stats -->
+    <section class="test-section">
+        <h2 class="section-title">Test Coverage Plan</h2>
+        <div class="test-grid">
+            <div class="test-card">
+                <div class="test-layer">
+                    <span style="color: var(--accent-purple);">&#9632;</span>
+                    Infrastructure
+                </div>
+                <div class="test-count">21 <span>test cases</span></div>
+                <div class="test-bar">
+                    <div class="test-bar-fill" style="width: 80%; background: var(--accent-purple);"></div>
+                </div>
+                <div class="test-target">Target: &ge; 80%</div>
+            </div>
+            <div class="test-card">
+                <div class="test-layer">
+                    <span style="color: var(--accent-green);">&#9632;</span>
+                    Domain
+                </div>
+                <div class="test-count">19 <span>test cases</span></div>
+                <div class="test-bar">
+                    <div class="test-bar-fill" style="width: 90%; background: var(--accent-green);"></div>
+                </div>
+                <div class="test-target">Target: &ge; 90%</div>
+            </div>
+            <div class="test-card">
+                <div class="test-layer">
+                    <span style="color: var(--accent-orange);">&#9632;</span>
+                    Application
+                </div>
+                <div class="test-count">5 <span>test cases</span></div>
+                <div class="test-bar">
+                    <div class="test-bar-fill" style="width: 70%; background: var(--accent-orange);"></div>
+                </div>
+                <div class="test-target">Target: &ge; 70%</div>
+            </div>
+            <div class="test-card">
+                <div class="test-layer">
+                    <span style="color: var(--accent-blue);">&#9632;</span>
+                    Presentation
+                </div>
+                <div class="test-count">Manual <span>+ pytest-qt</span></div>
+                <div class="test-bar">
+                    <div class="test-bar-fill" style="width: 50%; background: var(--accent-blue);"></div>
+                </div>
+                <div class="test-target">Target: &ge; 50%</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Risks -->
+    <section class="risk-section">
+        <h2 class="section-title">Risk Assessment</h2>
+        <div class="risk-grid">
+            <div class="risk-card">
+                <div class="risk-level risk-high"></div>
+                <div class="risk-content">
+                    <div class="risk-title">R1: rumps + PyQt6 Event Loop Conflict</div>
+                    <div class="risk-desc">Two different event loops (NSRunLoop vs Qt) cannot coexist in the same process.</div>
+                    <div class="risk-mitigation">Mitigation: QSystemTrayIcon first, rumps as fallback in separate process</div>
+                </div>
+            </div>
+            <div class="risk-card">
+                <div class="risk-level risk-high"></div>
+                <div class="risk-content">
+                    <div class="risk-title">R6: QThread Concurrency Issues</div>
+                    <div class="risk-desc">Multiple GitWorker threads accessing the same repository can cause race conditions.</div>
+                    <div class="risk-mitigation">Mitigation: Single worker queue pattern (one active GitWorker at a time)</div>
+                </div>
+            </div>
+            <div class="risk-card">
+                <div class="risk-level risk-medium"></div>
+                <div class="risk-content">
+                    <div class="risk-title">R2: PyInstaller macOS Packaging</div>
+                    <div class="risk-desc">Hidden imports, data files, and code signing can cause build failures.</div>
+                    <div class="risk-mitigation">Mitigation: Smoke test on Day 1, CI build test throughout development</div>
+                </div>
+            </div>
+            <div class="risk-card">
+                <div class="risk-level risk-medium"></div>
+                <div class="risk-content">
+                    <div class="risk-title">R5: GitPython Large Repo Performance</div>
+                    <div class="risk-desc">iter_commits on large repositories can be slow without limits.</div>
+                    <div class="risk-mitigation">Mitigation: Commit log limit, caching strategy via ConfigStore</div>
+                </div>
+            </div>
+            <div class="risk-card">
+                <div class="risk-level risk-medium"></div>
+                <div class="risk-content">
+                    <div class="risk-title">R7: macOS Permission (.app filesystem access)</div>
+                    <div class="risk-desc">Sandboxed .app may not access external git repos or config files.</div>
+                    <div class="risk-mitigation">Mitigation: Early entitlements setup, sandbox testing in Phase 3</div>
+                </div>
+            </div>
+            <div class="risk-card">
+                <div class="risk-level risk-low"></div>
+                <div class="risk-content">
+                    <div class="risk-title">R3: AWS CodeCommit Authentication</div>
+                    <div class="risk-desc">HTTPS/SSH credential management could fail in .app context.</div>
+                    <div class="risk-mitigation">Mitigation: Use local git credentials as-is, support both SSH/HTTPS</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="footer-inner">
+        <span class="footer-text">Git Dashboard Plan v0.2 | 2026-03-30 | jypark</span>
+        <div class="footer-links">
+            <span class="footer-link">Design: git-dashboard-design.md</span>
+            <span class="footer-link">Plan: git-dashboard-plan.md</span>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

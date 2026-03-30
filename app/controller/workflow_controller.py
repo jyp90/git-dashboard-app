@@ -1,0 +1,106 @@
+"""WorkflowController — 유스케이스 조율, Signal/Slot 중개."""
+from __future__ import annotations
+
+from PyQt6.QtCore import QObject, pyqtSignal
+
+from app.controller.git_worker import GitWorker
+from app.domain.branch_manager import BranchManager
+from app.domain.models import BranchSummary, SyncResult, BranchResult
+from app.infrastructure.config_store import ConfigStore
+from app.infrastructure.git_repository import GitRepository, GitRepositoryError
+
+
+class WorkflowController(QObject):
+    """UI 이벤트를 받아 Domain/Infrastructure를 호출하고 결과를 시그널로 방출.
+
+    UI는 이 컨트롤러의 시그널에만 연결 — Domain 직접 호출 금지.
+    """
+
+    # 브랜치 상태 업데이트
+    branch_summary_ready = pyqtSignal(object)   # BranchSummary
+    # 동기화 완료
+    sync_finished = pyqtSignal(object)           # SyncResult
+    # 브랜치 생성 완료
+    branch_created = pyqtSignal(object)          # BranchResult
+    # 에러
+    error_occurred = pyqtSignal(str)
+    # 작업 진행 중
+    task_running = pyqtSignal(bool)
+
+    def __init__(self, config_store: ConfigStore, parent=None) -> None:
+        super().__init__(parent)
+        self._config = config_store
+        self._repo: GitRepository | None = None
+        self._branch_manager: BranchManager | None = None
+        self._active_worker: GitWorker | None = None
+        self._load_active_repo()
+
+    def _load_active_repo(self) -> None:
+        """ConfigStore에서 활성 저장소를 로드."""
+        repo_cfg = self._config.get_active_repo()
+        if repo_cfg:
+            self._set_repository(repo_cfg.path)
+
+    def _set_repository(self, path: str) -> None:
+        try:
+            self._repo = GitRepository(path)
+            self._branch_manager = BranchManager(self._repo)
+        except GitRepositoryError as e:
+            self.error_occurred.emit(str(e))
+            self._repo = None
+            self._branch_manager = None
+
+    def switch_repository(self, path: str) -> None:
+        """활성 저장소 전환."""
+        self._config.set_active_repo(path)
+        self._set_repository(path)
+        self.refresh_branch_summary()
+
+    def _run_task(self, task) -> None:
+        """QThread로 task 실행. 동시에 하나만 허용."""
+        if self._active_worker and self._active_worker.isRunning():
+            self.error_occurred.emit("이미 작업이 진행 중입니다.")
+            return
+        worker = GitWorker(task)
+        self._active_worker = worker
+        self.task_running.emit(True)
+        worker.finished.connect(lambda: self.task_running.emit(False))
+        return worker
+
+    def refresh_branch_summary(self) -> None:
+        """브랜치 상태 비동기 갱신."""
+        if not self._branch_manager:
+            self.error_occurred.emit("저장소가 설정되지 않았습니다.")
+            return
+        worker = self._run_task(self._branch_manager.get_branch_summary)
+        worker.result_ready.connect(self.branch_summary_ready.emit)
+        worker.error_occurred.connect(self.error_occurred.emit)
+        worker.start()
+
+    def sync_develop(self) -> None:
+        """develop 브랜치 동기화 비동기 실행."""
+        if not self._branch_manager:
+            self.error_occurred.emit("저장소가 설정되지 않았습니다.")
+            return
+        worker = self._run_task(self._branch_manager.sync_develop)
+        worker.result_ready.connect(self.sync_finished.emit)
+        worker.error_occurred.connect(self.error_occurred.emit)
+        worker.start()
+
+    def create_release_branch(self, version: str) -> None:
+        """release 브랜치 생성 비동기 실행."""
+        if not self._branch_manager:
+            return
+        worker = self._run_task(lambda: self._branch_manager.create_release_branch(version))
+        worker.result_ready.connect(self.branch_created.emit)
+        worker.error_occurred.connect(self.error_occurred.emit)
+        worker.start()
+
+    def create_hotfix_branch(self, issue_id: str) -> None:
+        """hotfix 브랜치 생성 비동기 실행."""
+        if not self._branch_manager:
+            return
+        worker = self._run_task(lambda: self._branch_manager.create_hotfix_branch(issue_id))
+        worker.result_ready.connect(self.branch_created.emit)
+        worker.error_occurred.connect(self.error_occurred.emit)
+        worker.start()
