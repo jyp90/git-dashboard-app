@@ -1,15 +1,13 @@
-"""MainWindow — 탭 기반 메인 윈도우."""
+"""MainWindow — 사이드바 + 통합 대시보드 레이아웃."""
 from __future__ import annotations
 
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtWidgets import (
-    QComboBox,
     QHBoxLayout,
     QLabel,
     QMainWindow,
     QPushButton,
-    QStatusBar,
-    QTabWidget,
+    QSplitter,
     QToolBar,
     QVBoxLayout,
     QWidget,
@@ -17,86 +15,92 @@ from PyQt6.QtWidgets import (
 
 from app.controller.workflow_controller import WorkflowController
 from app.domain.models import BranchSummary, SyncResult
-from app.ui.branch_panel import BranchPanel
-from app.ui.commit_log_panel import CommitLogPanel
+from app.ui.dashboard_panel import DashboardPanel
 from app.ui.repo_manager_dialog import RepoManagerDialog
+from app.ui.repo_sidebar import RepoSidebar
 
 
 class MainWindow(QMainWindow):
-    """애플리케이션 메인 윈도우.
+    """메인 윈도우 — 좌측 저장소 사이드바 + 우측 통합 대시보드."""
 
-    WorkflowController와 연결되어 UI 이벤트를 컨트롤러로 전달하고
-    컨트롤러 시그널을 받아 UI를 업데이트한다.
-    """
-
-    _REFRESH_INTERVAL_MS = 30_000  # 30초마다 자동 갱신
+    _REFRESH_INTERVAL_MS = 30_000
 
     def __init__(self, controller: WorkflowController) -> None:
         super().__init__()
         self._controller = controller
         self._setup_window()
         self._setup_toolbar()
-        self._setup_tabs()
+        self._setup_central()
         self._setup_statusbar()
         self._connect_signals()
         self._start_auto_refresh()
-        # 초기 데이터 로드
         self._controller.refresh_branch_summary()
 
     # ── 초기 설정 ──────────────────────────────────────────────────────────
 
     def _setup_window(self) -> None:
         self.setWindowTitle("Git Dashboard")
-        self.setMinimumSize(920, 620)
-        self.resize(1100, 720)
-        # macOS 타이틀바 다크 처리
-        try:
-            from PyQt6.QtGui import QColor
-            from PyQt6.QtCore import Qt as QtCore
-        except ImportError:
-            pass
+        self.setMinimumSize(960, 640)
+        self.resize(1200, 760)
 
     def _setup_toolbar(self) -> None:
-        toolbar = QToolBar("메인 툴바")
+        toolbar = QToolBar()
         toolbar.setMovable(False)
+        toolbar.setFixedHeight(46)
         self.addToolBar(toolbar)
 
-        # 저장소 선택 콤보박스
-        repo_label = QLabel("저장소 ")
-        repo_label.setStyleSheet("color:#64748b; padding-left:4px;")
-        toolbar.addWidget(repo_label)
-
-        self._repo_combo = QComboBox()
-        self._repo_combo.setMinimumWidth(200)
-        self._repo_combo.currentIndexChanged.connect(self._on_repo_changed)
-        toolbar.addWidget(self._repo_combo)
-
-        # 저장소 관리 버튼
-        manage_btn = QPushButton("⊞")
-        manage_btn.setToolTip("저장소 추가 / 삭제 / 전환")
-        manage_btn.setFixedSize(30, 30)
-        manage_btn.setStyleSheet(
-            "QPushButton { background-color:#252540; color:#818cf8;"
-            "border:1px solid #3d3d6b; border-radius:6px; font-size:16px; min-width:0; padding:0; }"
-            "QPushButton:hover { background-color:#2d2d50; border-color:#6366f1; }"
+        # 앱 이름
+        title = QLabel("  Git Dashboard")
+        title.setStyleSheet(
+            "color:#e2e8f0; font-size:15px; font-weight:700; letter-spacing:0.3px;"
         )
-        manage_btn.clicked.connect(self._open_repo_manager)
-        toolbar.addWidget(manage_btn)
+        toolbar.addWidget(title)
 
-        self._refresh_repo_list()
+        # 구분 공백
+        spacer = QWidget()
+        spacer.setSizePolicy(
+            spacer.sizePolicy().horizontalPolicy(),
+            spacer.sizePolicy().verticalPolicy(),
+        )
+        from PyQt6.QtWidgets import QSizePolicy
+        spacer.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        toolbar.addWidget(spacer)
 
-    def _setup_tabs(self) -> None:
-        self._tabs = QTabWidget()
-        self._branch_panel = BranchPanel(self._controller)
-        self._commit_panel = CommitLogPanel(self._controller)
+        # 저장소 관리 버튼 (툴바 우측)
+        self._manage_btn = QPushButton("⊞  저장소 관리")
+        self._manage_btn.setFixedHeight(30)
+        self._manage_btn.setStyleSheet(
+            "QPushButton { background:#252540; color:#818cf8;"
+            "border:1px solid #3d3d6b; border-radius:6px; font-size:12px;"
+            "padding:4px 12px; min-width:0; }"
+            "QPushButton:hover { background:#2d2d50; border-color:#6366f1; color:#a5b4fc; }"
+        )
+        self._manage_btn.clicked.connect(self._open_repo_manager)
+        toolbar.addWidget(self._manage_btn)
 
-        self._tabs.addTab(self._branch_panel, "브랜치")
-        self._tabs.addTab(self._commit_panel, "커밋 로그")
-        # Phase 2에서 추가될 탭들 (플레이스홀더)
-        self._tabs.addTab(QWidget(), "PR 체크")
-        self._tabs.addTab(QWidget(), "워크플로우")
+        # 약간의 여백
+        toolbar.addWidget(QLabel("  "))
 
-        self.setCentralWidget(self._tabs)
+    def _setup_central(self) -> None:
+        # 좌우 분할
+        splitter = QSplitter(Qt.Orientation.Horizontal)
+        splitter.setHandleWidth(1)
+        splitter.setStyleSheet("QSplitter::handle { background:#2d2d4a; }")
+
+        # 좌측: 저장소 사이드바
+        self._sidebar = RepoSidebar(self._controller)
+        self._sidebar.repo_selected.connect(self._on_repo_selected)
+        splitter.addWidget(self._sidebar)
+
+        # 우측: 통합 대시보드
+        self._dashboard = DashboardPanel(self._controller)
+        splitter.addWidget(self._dashboard)
+
+        splitter.setSizes([190, 1010])
+        splitter.setStretchFactor(0, 0)
+        splitter.setStretchFactor(1, 1)
+
+        self.setCentralWidget(splitter)
 
     def _setup_statusbar(self) -> None:
         self._status_label = QLabel("준비")
@@ -118,38 +122,31 @@ class MainWindow(QMainWindow):
 
     # ── 이벤트 핸들러 ──────────────────────────────────────────────────────
 
-    def _refresh_repo_list(self) -> None:
-        self._repo_combo.blockSignals(True)
-        self._repo_combo.clear()
-        for repo in self._controller._config.get_repositories():
-            self._repo_combo.addItem(repo.name, userData=repo.path)
-            if repo.is_active:
-                self._repo_combo.setCurrentText(repo.name)
-        self._repo_combo.blockSignals(False)
-
-    def _on_repo_changed(self, index: int) -> None:
-        if index < 0:
-            return
-        path = self._repo_combo.currentData()
-        if path:
-            self._controller.switch_repository(path)
-
-    def _on_branch_summary(self, summary: BranchSummary) -> None:
-        status = summary.status.value.upper()
-        self._status_label.setText(f"{summary.current}  [{status}]  ↑{summary.ahead} ↓{summary.behind}")
-
-    def _on_sync_finished(self, result: SyncResult) -> None:
-        self._status_label.setText(result.message)
-        if result.success:
-            self._controller.refresh_branch_summary()
-
     def _open_repo_manager(self) -> None:
         dialog = RepoManagerDialog(self._controller, self)
-        dialog.repos_changed.connect(self._refresh_repo_list)
+        dialog.repos_changed.connect(self._sidebar.refresh)
         dialog.exec()
+
+    def _on_repo_selected(self, path: str) -> None:
+        self._controller.switch_repository(path)
+        self._sidebar.refresh()
+
+    def _on_branch_summary(self, summary: BranchSummary) -> None:
+        # 사이드바 상태 아이콘 업데이트
+        active = self._controller._config.get_active_repo()
+        if active:
+            self._sidebar.update_repo_status(active.path, summary.status)
+        status = summary.status.value.upper()
+        self._status_label.setText(
+            f"⎇ {summary.current}  ·  {status}  ·  ↑{summary.ahead} ↓{summary.behind}"
+        )
+
+    def _on_sync_finished(self, result: SyncResult) -> None:
+        if result.success:
+            self._controller.refresh_branch_summary()
 
     def _on_error(self, message: str) -> None:
         self._status_label.setText(f"오류: {message}")
 
     def _on_task_running(self, running: bool) -> None:
-        self._busy_label.setText("처리 중..." if running else "")
+        self._busy_label.setText("⟳ 처리 중..." if running else "")
