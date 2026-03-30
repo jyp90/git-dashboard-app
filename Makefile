@@ -1,6 +1,6 @@
 # Git Dashboard — 빌드 및 개발 편의 명령어
 
-.PHONY: run test build pkg clean open
+.PHONY: run test build pkg dmg clean open
 
 ## 개발 실행
 run:
@@ -33,6 +33,22 @@ pkg:
 		"dist/GitDashboard-0.1.0.pkg"
 	@echo "Installer ready: dist/GitDashboard-0.1.0.pkg"
 	@ls -lh "dist/GitDashboard-0.1.0.pkg"
+
+## .dmg 드래그 설치 이미지 빌드 (.app 빌드 선행 필요: make build)
+dmg:
+	create-dmg \
+		--volname "Git Dashboard" \
+		--window-pos 200 120 \
+		--window-size 600 400 \
+		--icon-size 128 \
+		--icon "Git Dashboard.app" 150 185 \
+		--hide-extension "Git Dashboard.app" \
+		--app-drop-link 450 185 \
+		--no-internet-enable \
+		"dist/GitDashboard-0.1.0.dmg" \
+		"dist/Git Dashboard.app"
+	@echo "DMG ready: dist/GitDashboard-0.1.0.dmg"
+	@ls -lh "dist/GitDashboard-0.1.0.dmg"
 
 ## 빌드된 .app 실행
 open:
