@@ -84,10 +84,13 @@ class MenuBarApp:
 
     def _connect_signals(self) -> None:
         self._controller.branch_summary_ready.connect(self._on_summary)
+        self._controller.sync_finished.connect(self._on_sync_finished)
 
     def _on_summary(self, summary) -> None:
+        prev_status = self._current_status
         self._current_branch = summary.current
         self._current_status = summary.status
+
         color = _STATUS_COLORS.get(summary.status, "#6366f1")
         if self._tray:
             self._tray.setIcon(_make_tray_icon(color))
@@ -98,6 +101,41 @@ class MenuBarApp:
             status_text = summary.status.value.upper()
             self._status_action.setText(
                 f"⎇  {summary.current}   ·   {status_text}   ↑{summary.ahead} ↓{summary.behind}"
+            )
+
+        # F-11: 상태 변경 시 알림 (최초 로드 제외)
+        if prev_status is not None and self._tray and prev_status != summary.status:
+            self._notify_status_change(summary)
+
+    def _notify_status_change(self, summary) -> None:
+        """F-11 — 브랜치 상태 변경 시 macOS 알림."""
+        if not self._tray:
+            return
+        if summary.status == BranchStatus.BEHIND:
+            self._tray.showMessage(
+                "Git Dashboard",
+                f"⬇  {summary.current}: {summary.behind}개 커밋 뒤처짐",
+                QSystemTrayIcon.MessageIcon.Warning,
+                4000,
+            )
+        elif summary.status == BranchStatus.DIVERGED:
+            self._tray.showMessage(
+                "Git Dashboard",
+                f"⚡  {summary.current}: 브랜치 충돌 위험 — Sync 필요",
+                QSystemTrayIcon.MessageIcon.Critical,
+                5000,
+            )
+
+    def _on_sync_finished(self, result) -> None:
+        """F-11 — 동기화 완료 알림."""
+        if not self._tray:
+            return
+        if result.success and result.commits_pulled > 0:
+            self._tray.showMessage(
+                "Git Dashboard",
+                f"✅  동기화 완료 ({result.commits_pulled}개 커밋)",
+                QSystemTrayIcon.MessageIcon.Information,
+                3000,
             )
 
     def _on_tray_activated(self, reason: QSystemTrayIcon.ActivationReason) -> None:

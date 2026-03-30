@@ -87,6 +87,17 @@ class GitRepository:
             remote_branches=remote,
         )
 
+    def get_hook_path(self, hook_name: str) -> Path | None:
+        """Git 훅 스크립트 경로 반환. 없거나 실행 불가면 None."""
+        try:
+            git_dir = Path(str(self._repo.git_dir))
+            hook = git_dir / "hooks" / hook_name
+            if hook.exists() and hook.is_file():
+                return hook
+        except Exception:
+            pass
+        return None
+
     def has_branch(self, name: str) -> bool:
         """로컬 브랜치 존재 여부 확인."""
         return name in [b.name for b in self._repo.branches]

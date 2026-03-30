@@ -221,6 +221,11 @@ class DashboardPanel(QWidget):
         self._hotfix_btn.clicked.connect(self._on_hotfix)
         row.addWidget(self._hotfix_btn)
 
+        self._hook_btn = _ActionButton("🔒  Pre-push", "primary")
+        self._hook_btn.setToolTip("pre-push 훅 스크립트 실행 결과 확인 (F-10)")
+        self._hook_btn.clicked.connect(self._on_pre_push)
+        row.addWidget(self._hook_btn)
+
         row.addStretch()
         return row
 
@@ -279,6 +284,7 @@ class DashboardPanel(QWidget):
         c.sync_finished.connect(self._on_sync_result)
         c.pr_check_ready.connect(self._on_pr_check_result)
         c.branch_created.connect(self._on_branch_created)
+        c.hook_result_ready.connect(self._on_hook_result)
         c.task_running.connect(self._on_busy)
 
     # ── 슬롯 ──────────────────────────────────────────────────────────────
@@ -361,8 +367,16 @@ class DashboardPanel(QWidget):
         if result.success:
             self._controller.refresh_branch_summary()
 
+    def _on_pre_push(self) -> None:
+        self._msg_label.setText("")
+        self._controller.run_pre_push_hook()
+
+    def _on_hook_result(self, result) -> None:
+        _HookResultDialog(result, self).exec()
+
     def _on_busy(self, running: bool) -> None:
-        for btn in (self._sync_btn, self._pr_btn, self._release_btn, self._hotfix_btn):
+        for btn in (self._sync_btn, self._pr_btn, self._release_btn,
+                    self._hotfix_btn, self._hook_btn):
             btn.setEnabled(not running)
         self._sync_btn.setText("처리 중..." if running else "↻  Sync Develop")
 
@@ -404,6 +418,40 @@ class _PrCheckDialog(QDialog):
             lines.append(f"{icon}  [{cat}]  {item.message}")
         result_text.setPlainText("\n".join(lines))
         layout.addWidget(result_text)
+
+        btn_box = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok)
+        btn_box.accepted.connect(self.accept)
+        layout.addWidget(btn_box)
+
+
+class _HookResultDialog(QDialog):
+    """Pre-push 훅 실행 결과 팝업 (F-10)."""
+
+    def __init__(self, result, parent=None) -> None:
+        super().__init__(parent)
+        self.setWindowTitle("Pre-push Hook 실행 결과")
+        self.setMinimumWidth(520)
+        layout = QVBoxLayout(self)
+        layout.setSpacing(12)
+        layout.setContentsMargins(16, 16, 16, 16)
+
+        icon = "✅" if result.success else "❌"
+        color = "#4ade80" if result.success else "#f87171"
+        status_text = "훅 통과" if result.success else f"훅 실패 (exit {result.return_code})"
+        header = QLabel(f"{icon}  {status_text}")
+        header.setStyleSheet(f"color:{color}; font-size:15px; font-weight:700; padding:4px 0;")
+        layout.addWidget(header)
+
+        output_text = QTextEdit()
+        output_text.setReadOnly(True)
+        output_text.setFixedHeight(180)
+        output_text.setStyleSheet(
+            "background:#141428; border-radius:8px; color:#94a3b8;"
+            "font-family:'SF Mono','Menlo',monospace; font-size:12px; padding:8px;"
+        )
+        combined = result.stdout or result.stderr or "(출력 없음)"
+        output_text.setPlainText(combined)
+        layout.addWidget(output_text)
 
         btn_box = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok)
         btn_box.accepted.connect(self.accept)

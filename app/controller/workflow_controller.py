@@ -24,6 +24,8 @@ class WorkflowController(QObject):
     branch_created = pyqtSignal(object)          # BranchResult
     # PR 체크 완료
     pr_check_ready = pyqtSignal(object)          # PrCheckReport
+    # Pre-push 훅 실행 완료 (F-10)
+    hook_result_ready = pyqtSignal(object)       # ScriptResult
     # 에러
     error_occurred = pyqtSignal(str)
     # 작업 진행 중
@@ -169,5 +171,27 @@ class WorkflowController(QObject):
         if worker is None:
             return
         worker.result_ready.connect(self.pr_check_ready.emit)
+        worker.error_occurred.connect(self.error_occurred.emit)
+        worker.start()
+
+    def run_pre_push_hook(self) -> None:
+        """pre-push 훅 스크립트 실행 비동기 (F-10)."""
+        if not self._repo:
+            self.error_occurred.emit("저장소가 설정되지 않았습니다.")
+            return
+        from app.domain.models import ScriptResult
+        from app.infrastructure.script_runner import ScriptRunner
+        hook_path = self._repo.get_hook_path("pre-push")
+        if hook_path is None:
+            self.hook_result_ready.emit(
+                ScriptResult(True, "pre-push 훅이 설정되어 있지 않습니다.", "", 0)
+            )
+            return
+        runner = ScriptRunner(hook_path.parent)
+        repo_path = str(self._repo.path)
+        worker = self._run_task(lambda: runner.run(hook_path.name, cwd=repo_path))
+        if worker is None:
+            return
+        worker.result_ready.connect(self.hook_result_ready.emit)
         worker.error_occurred.connect(self.error_occurred.emit)
         worker.start()
