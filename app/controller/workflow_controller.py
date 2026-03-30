@@ -56,16 +56,37 @@ class WorkflowController(QObject):
         self._set_repository(path)
         self.refresh_branch_summary()
 
-    def _run_task(self, task) -> None:
-        """QThread로 task 실행. 동시에 하나만 허용."""
+    def _run_task(self, task) -> GitWorker | None:
+        """QThread로 task 실행. 동시에 하나만 허용. 실행 불가 시 None 반환."""
         if self._active_worker and self._active_worker.isRunning():
             self.error_occurred.emit("이미 작업이 진행 중입니다.")
-            return
+            return None
         worker = GitWorker(task)
         self._active_worker = worker
         self.task_running.emit(True)
         worker.finished.connect(lambda: self.task_running.emit(False))
         return worker
+
+    def add_repository(self, path: str, name: str) -> bool:
+        """저장소 등록. 성공 시 True 반환."""
+        try:
+            GitRepository(path)  # 유효한 git 저장소인지 확인
+        except GitRepositoryError as e:
+            self.error_occurred.emit(str(e))
+            return False
+        self._config.add_repository(path, name)
+        return True
+
+    def remove_repository(self, path: str) -> None:
+        """저장소 삭제."""
+        self._config.remove_repository(path)
+        # 삭제 후 활성 저장소가 없으면 다음 저장소로 전환
+        active = self._config.get_active_repo()
+        if active:
+            self._set_repository(active.path)
+        else:
+            self._repo = None
+            self._branch_manager = None
 
     def refresh_branch_summary(self) -> None:
         """브랜치 상태 비동기 갱신."""
@@ -73,6 +94,8 @@ class WorkflowController(QObject):
             self.error_occurred.emit("저장소가 설정되지 않았습니다.")
             return
         worker = self._run_task(self._branch_manager.get_branch_summary)
+        if worker is None:
+            return
         worker.result_ready.connect(self.branch_summary_ready.emit)
         worker.error_occurred.connect(self.error_occurred.emit)
         worker.start()
@@ -83,6 +106,8 @@ class WorkflowController(QObject):
             self.error_occurred.emit("저장소가 설정되지 않았습니다.")
             return
         worker = self._run_task(self._branch_manager.sync_develop)
+        if worker is None:
+            return
         worker.result_ready.connect(self.sync_finished.emit)
         worker.error_occurred.connect(self.error_occurred.emit)
         worker.start()
@@ -92,6 +117,8 @@ class WorkflowController(QObject):
         if not self._branch_manager:
             return
         worker = self._run_task(lambda: self._branch_manager.create_release_branch(version))
+        if worker is None:
+            return
         worker.result_ready.connect(self.branch_created.emit)
         worker.error_occurred.connect(self.error_occurred.emit)
         worker.start()
@@ -101,6 +128,8 @@ class WorkflowController(QObject):
         if not self._branch_manager:
             return
         worker = self._run_task(lambda: self._branch_manager.create_hotfix_branch(issue_id))
+        if worker is None:
+            return
         worker.result_ready.connect(self.branch_created.emit)
         worker.error_occurred.connect(self.error_occurred.emit)
         worker.start()

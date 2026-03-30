@@ -7,6 +7,7 @@ from PyQt6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QMainWindow,
+    QPushButton,
     QStatusBar,
     QTabWidget,
     QToolBar,
@@ -18,6 +19,7 @@ from app.controller.workflow_controller import WorkflowController
 from app.domain.models import BranchSummary, SyncResult
 from app.ui.branch_panel import BranchPanel
 from app.ui.commit_log_panel import CommitLogPanel
+from app.ui.repo_manager_dialog import RepoManagerDialog
 
 
 class MainWindow(QMainWindow):
@@ -60,11 +62,27 @@ class MainWindow(QMainWindow):
         self.addToolBar(toolbar)
 
         # 저장소 선택 콤보박스
-        toolbar.addWidget(QLabel("저장소: "))
+        repo_label = QLabel("저장소 ")
+        repo_label.setStyleSheet("color:#64748b; padding-left:4px;")
+        toolbar.addWidget(repo_label)
+
         self._repo_combo = QComboBox()
         self._repo_combo.setMinimumWidth(200)
         self._repo_combo.currentIndexChanged.connect(self._on_repo_changed)
         toolbar.addWidget(self._repo_combo)
+
+        # 저장소 관리 버튼
+        manage_btn = QPushButton("⊞")
+        manage_btn.setToolTip("저장소 추가 / 삭제 / 전환")
+        manage_btn.setFixedSize(30, 30)
+        manage_btn.setStyleSheet(
+            "QPushButton { background-color:#252540; color:#818cf8;"
+            "border:1px solid #3d3d6b; border-radius:6px; font-size:16px; min-width:0; padding:0; }"
+            "QPushButton:hover { background-color:#2d2d50; border-color:#6366f1; }"
+        )
+        manage_btn.clicked.connect(self._open_repo_manager)
+        toolbar.addWidget(manage_btn)
+
         self._refresh_repo_list()
 
     def _setup_tabs(self) -> None:
@@ -124,6 +142,11 @@ class MainWindow(QMainWindow):
         self._status_label.setText(result.message)
         if result.success:
             self._controller.refresh_branch_summary()
+
+    def _open_repo_manager(self) -> None:
+        dialog = RepoManagerDialog(self._controller, self)
+        dialog.repos_changed.connect(self._refresh_repo_list)
+        dialog.exec()
 
     def _on_error(self, message: str) -> None:
         self._status_label.setText(f"오류: {message}")
