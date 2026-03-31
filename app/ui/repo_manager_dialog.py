@@ -60,6 +60,13 @@ class RepoManagerDialog(QDialog):
         self._activate_btn = QPushButton("✓ 활성화")
         self._activate_btn.setToolTip("선택한 저장소를 활성 저장소로 전환")
         self._activate_btn.clicked.connect(self._on_activate)
+        self._rename_btn = QPushButton("✎ 이름 변경")
+        self._rename_btn.setToolTip("저장소 표시 이름 변경")
+        self._rename_btn.setStyleSheet(
+            "background-color:#1e3a5f; color:#60a5fa;"
+            "border-radius:6px; padding:6px 14px;"
+        )
+        self._rename_btn.clicked.connect(self._on_rename)
         self._remove_btn = QPushButton("✕ 삭제")
         self._remove_btn.setToolTip("선택한 저장소를 목록에서 제거")
         self._remove_btn.setStyleSheet(
@@ -68,6 +75,7 @@ class RepoManagerDialog(QDialog):
         )
         self._remove_btn.clicked.connect(self._on_remove)
         list_btns.addWidget(self._activate_btn)
+        list_btns.addWidget(self._rename_btn)
         list_btns.addWidget(self._remove_btn)
         list_btns.addStretch()
         layout.addLayout(list_btns)
@@ -164,6 +172,22 @@ class RepoManagerDialog(QDialog):
         self._controller.switch_repository(path)
         self._load_repos()
         self.repos_changed.emit()
+
+    def _on_rename(self) -> None:
+        item = self._list.currentItem()
+        if not item:
+            return
+        path = item.data(Qt.ItemDataRole.UserRole)
+        current_name = item.text().strip().lstrip("●").strip().split("—")[0].strip()
+        new_name, ok = QLineEdit(), False
+        from PyQt6.QtWidgets import QInputDialog
+        new_name, ok = QInputDialog.getText(
+            self, "저장소 이름 변경", "새 이름:", text=current_name
+        )
+        if ok and new_name.strip():
+            self._controller.rename_repository(path, new_name.strip())
+            self._load_repos()
+            self.repos_changed.emit()
 
     def _on_remove(self) -> None:
         item = self._list.currentItem()

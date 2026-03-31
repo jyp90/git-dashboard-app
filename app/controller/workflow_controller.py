@@ -114,6 +114,20 @@ class WorkflowController(QObject):
             self._repo = None
             self._branch_manager = None
 
+    def rename_repository(self, path: str, new_name: str) -> None:
+        """저장소 표시 이름 변경."""
+        self._config.rename_repository(path, new_name)
+
+    def get_repository(self) -> "GitRepository | None":
+        """현재 활성 GitRepository 반환 (v2 도메인 객체 직접 접근용)."""
+        return self._repo
+
+    def get_worktrees(self) -> list[dict]:
+        """현재 저장소의 worktree 목록 반환."""
+        if not self._repo:
+            return []
+        return self._repo.get_worktrees()
+
     def refresh_branch_summary(self) -> None:
         """브랜치 상태 비동기 갱신."""
         if not self._branch_manager:

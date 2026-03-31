@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
+    QAbstractItemView,
     QDialog,
     QDialogButtonBox,
     QFrame,
@@ -14,6 +15,8 @@ from PyQt6.QtWidgets import (
     QPushButton,
     QScrollArea,
     QSizePolicy,
+    QTableWidget,
+    QTableWidgetItem,
     QTextEdit,
     QVBoxLayout,
     QWidget,
@@ -229,28 +232,54 @@ class DashboardPanel(QWidget):
         row.addStretch()
         return row
 
-    def _build_commit_list(self) -> QListWidget:
-        w = QListWidget()
-        w.setFrameShape(QListWidget.Shape.NoFrame)
-        w.setFixedHeight(200)
+    def _build_commit_list(self) -> QTableWidget:
+        headers = ["Hash", "Commit Message", "Author", "Date"]
+        w = QTableWidget(0, len(headers))
+        w.setHorizontalHeaderLabels(headers)
+        w.setFrameShape(QTableWidget.Shape.NoFrame)
+        w.setFixedHeight(230)
+        w.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        w.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        w.setShowGrid(False)
+        w.verticalHeader().setVisible(False)
+        w.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        w.horizontalHeader().setStretchLastSection(False)
+
+        # 컬럼 너비
+        w.setColumnWidth(0, 70)   # Hash
+        w.setColumnWidth(2, 100)  # Author
+        w.setColumnWidth(3, 100)  # Date
+        w.horizontalHeader().setSectionResizeMode(1, w.horizontalHeader().ResizeMode.Stretch)
+
         w.setStyleSheet("""
-            QListWidget {
+            QTableWidget {
                 background: #141428;
                 border-radius: 8px;
-                padding: 4px;
                 outline: none;
-            }
-            QListWidget::item {
-                padding: 7px 10px;
-                border-radius: 4px;
+                gridline-color: transparent;
                 font-family: 'SF Mono','Menlo','Fira Code',monospace;
                 font-size: 12px;
                 color: #94a3b8;
             }
-            QListWidget::item:hover { background: #1e1e38; color: #e2e8f0; }
-            QListWidget::item:selected { background: #312e81; color: #c7d2fe; }
+            QTableWidget::item {
+                padding: 0px 8px;
+                border-bottom: 1px solid #1a1a38;
+            }
+            QTableWidget::item:hover { background: #1e1e38; color: #e2e8f0; }
+            QTableWidget::item:selected { background: #312e81; color: #c7d2fe; }
+            QHeaderView::section {
+                background: #0f0f1f;
+                color: #475569;
+                font-size: 10px;
+                font-weight: 700;
+                letter-spacing: 0.8px;
+                padding: 6px 8px;
+                border: none;
+                border-bottom: 1px solid #2d2d4a;
+                text-transform: uppercase;
+            }
         """)
-        w.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        w.verticalHeader().setDefaultSectionSize(32)
         return w
 
     def _build_branch_list(self) -> QListWidget:
@@ -326,11 +355,30 @@ class DashboardPanel(QWidget):
         self._commit_worker.start()
 
     def _show_commits(self, commits: list[Commit]) -> None:
-        self._commit_list.clear()
+        self._commit_list.setRowCount(0)
         for c in commits:
+            row = self._commit_list.rowCount()
+            self._commit_list.insertRow(row)
+
+            # Hash
+            hash_item = QTableWidgetItem(c.short_hash)
+            hash_item.setForeground(Qt.GlobalColor.darkCyan)
+            self._commit_list.setItem(row, 0, hash_item)
+
+            # Message
+            msg_item = QTableWidgetItem(c.summary)
+            self._commit_list.setItem(row, 1, msg_item)
+
+            # Author
+            author_item = QTableWidgetItem(c.author)
+            author_item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+            self._commit_list.setItem(row, 2, author_item)
+
+            # Date
             date_str = c.date.strftime("%m-%d %H:%M")
-            text = f"{c.short_hash}  {c.summary:<52}  {c.author:<14}  {date_str}"
-            self._commit_list.addItem(text)
+            date_item = QTableWidgetItem(date_str)
+            date_item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+            self._commit_list.setItem(row, 3, date_item)
 
     def _on_sync_result(self, result: SyncResult) -> None:
         color = "#4ade80" if result.success else "#f87171"

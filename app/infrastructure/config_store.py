@@ -64,6 +64,13 @@ class ConfigStore:
     def get_theme(self) -> str:
         return self._data.get("theme", "dark")
 
+    def rename_repository(self, path: str, new_name: str) -> None:
+        for r in self._data.get("repositories", []):
+            if r["path"] == path:
+                r["name"] = new_name
+                break
+        self._save()
+
     def set_theme(self, theme: str) -> None:
         self._data["theme"] = theme
         self._save()

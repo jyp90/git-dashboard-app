@@ -3,9 +3,12 @@ from __future__ import annotations
 
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtWidgets import (
+    QInputDialog,
     QLabel,
     QListWidget,
     QListWidgetItem,
+    QMenu,
+    QMessageBox,
     QPushButton,
     QVBoxLayout,
     QWidget,
@@ -80,6 +83,8 @@ class RepoSidebar(QWidget):
             }
         """)
         self._list.itemClicked.connect(self._on_item_clicked)
+        self._list.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self._list.customContextMenuRequested.connect(self._on_context_menu)
         layout.addWidget(self._list, stretch=1)
 
         # 관리 버튼
@@ -133,6 +138,59 @@ class RepoSidebar(QWidget):
         path = item.data(Qt.ItemDataRole.UserRole)
         if path:
             self.repo_selected.emit(path)
+
+    def _on_context_menu(self, pos) -> None:
+        """우클릭 컨텍스트 메뉴."""
+        item = self._list.itemAt(pos)
+        if item is None:
+            return
+        path = item.data(Qt.ItemDataRole.UserRole)
+        if not path:
+            return
+
+        menu = QMenu(self)
+        menu.setStyleSheet("""
+            QMenu { background:#1a1a2e; border:1px solid #2d2d4a; color:#d4d4d4; }
+            QMenu::item { padding:6px 20px; }
+            QMenu::item:selected { background:#252550; color:#a5b4fc; }
+        """)
+        rename_action = menu.addAction("✎  이름 변경")
+        menu.addSeparator()
+        remove_action = menu.addAction("✕  삭제")
+
+        action = menu.exec(self._list.mapToGlobal(pos))
+        if action == rename_action:
+            self._rename_repo(path)
+        elif action == remove_action:
+            self._remove_repo(path)
+
+    def _rename_repo(self, path: str) -> None:
+        """저장소 이름 변경."""
+        # 현재 이름 조회
+        current_name = path.split("/")[-1]
+        for repo in self._controller.get_repositories():
+            if repo.path == path:
+                current_name = repo.name
+                break
+
+        new_name, ok = QInputDialog.getText(
+            self, "저장소 이름 변경", "새 이름:", text=current_name
+        )
+        if ok and new_name.strip():
+            self._controller.rename_repository(path, new_name.strip())
+            self.refresh()
+
+    def _remove_repo(self, path: str) -> None:
+        """저장소 삭제."""
+        name = path.split("/")[-1]
+        reply = QMessageBox.question(
+            self, "삭제 확인",
+            f"'{name}' 저장소를 목록에서 제거하시겠습니까?\n(로컬 파일은 삭제되지 않습니다)",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+        )
+        if reply == QMessageBox.StandardButton.Yes:
+            self._controller.remove_repository(path)
+            self.refresh()
 
     def _open_manager(self) -> None:
         from app.ui.repo_manager_dialog import RepoManagerDialog
