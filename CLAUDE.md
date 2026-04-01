@@ -24,8 +24,21 @@
 
 ## 2. 기본 에이전트
 
-Python 파일(`*.py`, `pyproject.toml`) 감지 시 → `python-pro` 사용
-코드 분석/리뷰 요청 시 → `python-analyzer` 사용
+| 상황 | 에이전트 |
+|------|---------|
+| PyQt6 위젯 구현 / QSS 스타일 / Design System | `pyqt-desktop-dev` ← **기본** |
+| Git 도메인 로직 / 비즈니스 로직 / 데이터 처리 | `python-pro` |
+| 코드 분석 / 리뷰 / 보안 검토 | `python-analyzer` |
+
+### pyqt-desktop-dev 에이전트 (프로젝트 전용)
+
+`~/.claude/agents/pyqt-desktop-dev.md` — PyQt6 macOS 데스크탑 앱 전문가.
+
+- Design System 토큰 (`C`, `T`, `S`, `QSS`) 완전 숙지
+- 4-Layer 아키텍처 원칙 강제
+- QThread/GitWorker 비동기 패턴
+- macOS 최적화 (Retina, Keychain, PyInstaller)
+- 금지 폰트 목록 인지: `-apple-system`, `SF Pro`, `SF Mono`, `Fira Code`, `monospace`
 
 ---
 
@@ -149,9 +162,9 @@ git-dashboard/
 
 | 상황 | 실행 |
 |------|------|
-| PyQt6 위젯 구현 | `python-pro` |
-| Git 도메인 로직 | `python-pro` |
+| PyQt6 위젯 구현 / QSS 스타일 | `pyqt-desktop-dev` |
+| Git 도메인 로직 / 데이터 처리 | `python-pro` |
 | 코드 리뷰 요청 | `python-analyzer` |
 | 테스트 작성/반복 | `/test-iterate` |
-| Gap 분석 | `/pdca analyze git-dashboard` |
-| 완료 보고 | `/pdca report git-dashboard` |
+| Gap 분석 | `/pdca analyze git-dashboard-commit-workflow` |
+| 완료 보고 | `/pdca report git-dashboard-commit-workflow` |

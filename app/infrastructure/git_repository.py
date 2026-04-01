@@ -350,3 +350,122 @@ class GitRepository:
             wt["is_main"] = i == 0
 
         return worktrees
+
+    # ─── F-20: Commit Workflow ───────────────────────────────────────────────
+
+    def get_working_tree_status(self) -> list[dict]:
+        """워킹 트리 파일별 Stage 상태 반환.
+
+        Returns:
+            list of {"path": str, "staged": bool, "unstaged": bool, "status": str}
+            status: "M"(modified) | "A"(added) | "D"(deleted) | "R"(renamed) | "?"(untracked)
+        """
+        result: list[dict] = []
+        try:
+            # porcelain 형식: "XY path" (X=staged, Y=unstaged)
+            raw = self._repo.git.status("--porcelain", "-u")
+            for line in raw.splitlines():
+                if not line:
+                    continue
+                x, y = line[0], line[1]
+                path = line[3:]
+                # rename 처리: "old -> new"
+                if " -> " in path:
+                    path = path.split(" -> ")[1]
+                staged = x != " " and x != "?"
+                unstaged = y != " " or x == "?"
+                status = x if staged else (y if y != " " else "?")
+                result.append({
+                    "path": path.strip(),
+                    "staged": staged,
+                    "unstaged": unstaged,
+                    "status": status,
+                })
+        except Exception:
+            pass
+        return result
+
+    def stage_file(self, path: str) -> bool:
+        """특정 파일 stage (git add)."""
+        try:
+            self._repo.git.add(path)
+            return True
+        except Exception:
+            return False
+
+    def unstage_file(self, path: str) -> bool:
+        """특정 파일 unstage (git reset HEAD)."""
+        try:
+            self._repo.git.reset("HEAD", "--", path)
+            return True
+        except Exception:
+            return False
+
+    def stage_all(self) -> bool:
+        """전체 변경사항 stage (git add -A)."""
+        try:
+            self._repo.git.add("-A")
+            return True
+        except Exception:
+            return False
+
+    def unstage_all(self) -> bool:
+        """전체 stage 취소 (git reset HEAD)."""
+        try:
+            self._repo.git.reset("HEAD")
+            return True
+        except Exception:
+            return False
+
+    def discard_file(self, path: str) -> bool:
+        """워킹 트리 변경사항 되돌리기 (git checkout -- path)."""
+        try:
+            self._repo.git.checkout("--", path)
+            return True
+        except Exception:
+            return False
+
+    def commit(self, message: str, amend: bool = False) -> tuple[bool, str]:
+        """커밋 실행.
+
+        Returns:
+            (success: bool, message: str)
+        """
+        if not message.strip() and not amend:
+            return False, "커밋 메시지를 입력하세요."
+        try:
+            args = ["commit"]
+            if amend:
+                args.append("--amend")
+                if message.strip():
+                    args.extend(["-m", message])
+                else:
+                    args.append("--no-edit")
+            else:
+                args.extend(["-m", message])
+            result = self._repo.git.execute(["git"] + args)
+            return True, result
+        except Exception as e:
+            return False, str(e)
+
+    def get_last_commit_message(self) -> str:
+        """마지막 커밋 메시지 반환 (amend 용)."""
+        try:
+            return self._repo.git.log("-1", "--format=%s%n%n%b").strip()
+        except Exception:
+            return ""
+
+    def push(self, remote: str = "origin", branch: str | None = None) -> tuple[bool, str]:
+        """git push 실행.
+
+        Returns:
+            (success: bool, message: str)
+        """
+        try:
+            args = ["push", remote]
+            if branch:
+                args.append(branch)
+            result = self._repo.git.execute(["git"] + args)
+            return True, result or "Push 완료"
+        except Exception as e:
+            return False, str(e)

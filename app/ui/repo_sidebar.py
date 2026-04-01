@@ -16,6 +16,7 @@ from PyQt6.QtWidgets import (
 
 from app.controller.workflow_controller import WorkflowController
 from app.domain.models import BranchStatus
+from app.ui.design_system import C, T
 
 
 # 상태별 색상
@@ -42,7 +43,10 @@ class RepoSidebar(QWidget):
 
     def _setup_ui(self) -> None:
         self.setFixedWidth(190)
-        self.setStyleSheet("background-color:#12121f; border-right:1px solid #2d2d4a;")
+        self.setStyleSheet(
+            f"background-color:{C.BG_DEEP};"
+            f"border-right:1px solid {C.BORDER_SUBTLE};"
+        )
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -52,36 +56,25 @@ class RepoSidebar(QWidget):
         header = QLabel("  REPOSITORIES")
         header.setFixedHeight(36)
         header.setStyleSheet(
-            "color:#475569; font-size:10px; font-weight:700; letter-spacing:1.2px;"
-            "background:#0f0f17; border-bottom:1px solid #1e1e38; padding-left:12px;"
+            f"color:{C.TEXT_DISABLED};font-size:{T.SIZE_XS};"
+            f"font-weight:{T.WEIGHT_BOLD};letter-spacing:1.4px;"
+            f"background:{C.BG_DEEP};"
+            f"border-bottom:1px solid {C.BORDER_FAINT};padding-left:12px;"
         )
         layout.addWidget(header)
 
         # 저장소 리스트
         self._list = QListWidget()
         self._list.setFrameShape(QListWidget.Shape.NoFrame)
-        self._list.setStyleSheet("""
-            QListWidget {
-                background: #12121f;
-                border: none;
-                outline: none;
-            }
-            QListWidget::item {
-                padding: 10px 12px;
-                border-bottom: 1px solid #1a1a2e;
-                color: #94a3b8;
-                font-size: 13px;
-            }
-            QListWidget::item:hover {
-                background: #1a1a2e;
-                color: #e2e8f0;
-            }
-            QListWidget::item:selected {
-                background: #1e1e38;
-                color: #a5b4fc;
-                border-left: 3px solid #6366f1;
-            }
-        """)
+        self._list.setStyleSheet(
+            f"QListWidget{{background:{C.BG_DEEP};border:none;outline:none;}}"
+            f"QListWidget::item{{padding:10px 12px;"
+            f"border-bottom:1px solid {C.BORDER_FAINT};"
+            f"color:{C.TEXT_SECONDARY};font-size:{T.SIZE_MD};}}"
+            f"QListWidget::item:hover{{background:{C.BG_SURFACE};color:{C.TEXT_PRIMARY};}}"
+            f"QListWidget::item:selected{{background:{C.BG_RAISED};"
+            f"color:{C.ACCENT_LIGHT};border-left:3px solid {C.ACCENT};}}"
+        )
         self._list.itemClicked.connect(self._on_item_clicked)
         self._list.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self._list.customContextMenuRequested.connect(self._on_context_menu)
@@ -91,9 +84,10 @@ class RepoSidebar(QWidget):
         manage_btn = QPushButton("＋  저장소 관리")
         manage_btn.setFixedHeight(36)
         manage_btn.setStyleSheet(
-            "QPushButton { background:#1a1a2e; color:#6366f1; border:none;"
-            "border-top:1px solid #2d2d4a; font-size:12px; text-align:left; padding-left:14px; }"
-            "QPushButton:hover { background:#1e1e38; color:#818cf8; }"
+            f"QPushButton{{background:{C.BG_DEEP};color:{C.ACCENT};border:none;"
+            f"border-top:1px solid {C.BORDER_SUBTLE};"
+            f"font-size:{T.SIZE_BASE};text-align:left;padding-left:14px;}}"
+            f"QPushButton:hover{{background:{C.BG_SURFACE};color:{C.ACCENT_HOVER};}}"
         )
         manage_btn.clicked.connect(self._open_manager)
         layout.addWidget(manage_btn)
@@ -152,7 +146,7 @@ class RepoSidebar(QWidget):
         menu.setStyleSheet("""
             QMenu { background:#1a1a2e; border:1px solid #2d2d4a; color:#d4d4d4; }
             QMenu::item { padding:6px 20px; }
-            QMenu::item:selected { background:#252550; color:#a5b4fc; }
+            QMenu::item:selected { background:#252550; color:#7dd3fc; }
         """)
         rename_action = menu.addAction("✎  이름 변경")
         menu.addSeparator()

@@ -144,7 +144,7 @@ class DiffViewer(QWidget):
             QPlainTextEdit {
                 background-color: #1e1e1e;
                 color: #d4d4d4;
-                font-family: 'JetBrains Mono', 'Menlo', 'Monaco', monospace;
+                font-family: 'Menlo', 'Monaco';
                 font-size: 13px;
                 border: none;
             }
@@ -221,36 +221,53 @@ class DiffViewer(QWidget):
 
             for line in hunk.lines:
                 if line.type == "add":
-                    self._append_text(cursor_l, "\n", QColor("#d4d4d4"))  # 빈 줄 (좌측)
-                    self._append_text(cursor_r, f"+ {line.content}\n", self.COLOR_ADD_FG, bg=self.COLOR_ADD_BG)
+                    self._append_text(cursor_l, "     │  \n", self.COLOR_LINE_NO)
+                    new_str = f"{line.new_line_no:4}" if line.new_line_no is not None else "    "
+                    self._append_text(cursor_r, f"{new_str} │ ", self.COLOR_LINE_NO, bg=self.COLOR_ADD_BG)
+                    self._append_text(cursor_r, f"+  {line.content}\n", self.COLOR_ADD_FG, bg=self.COLOR_ADD_BG)
                 elif line.type == "delete":
-                    self._append_text(cursor_l, f"- {line.content}\n", self.COLOR_DEL_FG, bg=self.COLOR_DEL_BG)
-                    self._append_text(cursor_r, "\n", QColor("#d4d4d4"))  # 빈 줄 (우측)
+                    old_str = f"{line.old_line_no:4}" if line.old_line_no is not None else "    "
+                    self._append_text(cursor_l, f"{old_str} │ ", self.COLOR_LINE_NO, bg=self.COLOR_DEL_BG)
+                    self._append_text(cursor_l, f"-  {line.content}\n", self.COLOR_DEL_FG, bg=self.COLOR_DEL_BG)
+                    self._append_text(cursor_r, "     │  \n", self.COLOR_LINE_NO)
                 else:
-                    text = f"  {line.content}\n"
-                    self._append_text(cursor_l, text, QColor("#d4d4d4"))
-                    self._append_text(cursor_r, text, QColor("#d4d4d4"))
+                    old_str = f"{line.old_line_no:4}" if line.old_line_no is not None else "    "
+                    new_str = f"{line.new_line_no:4}" if line.new_line_no is not None else "    "
+                    self._append_text(cursor_l, f"{old_str} │ ", self.COLOR_LINE_NO)
+                    self._append_text(cursor_l, f"   {line.content}\n", QColor("#d4d4d4"))
+                    self._append_text(cursor_r, f"{new_str} │ ", self.COLOR_LINE_NO)
+                    self._append_text(cursor_r, f"   {line.content}\n", QColor("#d4d4d4"))
 
     def _append_diff_line(self, cursor: QTextCursor, line: DiffLine) -> None:
-        """diff 라인 하나를 커서에 추가."""
+        """diff 라인 하나를 커서에 추가 (라인넘버 gutter 포함)."""
         if line.type == "add":
-            prefix = "+ "
+            prefix = "+"
             fg = self.COLOR_ADD_FG
             bg = self.COLOR_ADD_BG
+            old_str = "    "
+            new_str = f"{line.new_line_no:4}" if line.new_line_no is not None else "    "
         elif line.type == "delete":
-            prefix = "- "
+            prefix = "-"
             fg = self.COLOR_DEL_FG
             bg = self.COLOR_DEL_BG
+            old_str = f"{line.old_line_no:4}" if line.old_line_no is not None else "    "
+            new_str = "    "
         elif line.type == "context":
-            prefix = "  "
+            prefix = " "
             fg = QColor("#d4d4d4")
             bg = None
+            old_str = f"{line.old_line_no:4}" if line.old_line_no is not None else "    "
+            new_str = f"{line.new_line_no:4}" if line.new_line_no is not None else "    "
         else:
-            prefix = "  "
+            prefix = " "
             fg = QColor("#888888")
             bg = None
+            old_str = "    "
+            new_str = "    "
 
-        self._append_text(cursor, f"{prefix}{line.content}\n", fg, bg=bg)
+        gutter = f"{old_str} {new_str} │ "
+        self._append_text(cursor, gutter, self.COLOR_LINE_NO, bg=bg)
+        self._append_text(cursor, f"{prefix} {line.content}\n", fg, bg=bg)
 
     def _append_text(
         self,

@@ -59,12 +59,12 @@ class BranchPanel(QWidget):
 
         # 브랜치 아이콘 + 이름
         branch_icon = QLabel("⎇")
-        branch_icon.setStyleSheet("font-size:20px; color:#818cf8; margin-right:4px;")
+        branch_icon.setStyleSheet("font-size:20px; color:#38bdf8; margin-right:4px;")
         header_layout.addWidget(branch_icon)
 
         self._branch_label = QLabel("—")
         self._branch_label.setStyleSheet(
-            "font-size:17px; font-weight:700; color:#e2e8f0; font-family:'SF Mono','Menlo',monospace;"
+            "font-size:17px; font-weight:700; color:#e2e8f0; font-family:'Menlo';"
         )
         header_layout.addWidget(self._branch_label)
 

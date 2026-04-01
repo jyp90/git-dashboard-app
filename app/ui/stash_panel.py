@@ -29,9 +29,9 @@ def _action_btn(text: str, variant: str = "default") -> QPushButton:
     btn.setFixedHeight(30)
     styles = {
         "default": (
-            "QPushButton { background:#252540; color:#a5b4fc; border:1px solid #3d3d6b;"
+            "QPushButton { background:#252540; color:#7dd3fc; border:1px solid #3d3d6b;"
             "border-radius:5px; padding:2px 14px; font-size:12px; }"
-            "QPushButton:hover { background:#2d2d50; color:#c7d2fe; }"
+            "QPushButton:hover { background:#2d2d50; color:#bae6fd; }"
             "QPushButton:disabled { color:#3d3d6b; border-color:#2d2d4a; }"
         ),
         "success": (
@@ -141,10 +141,10 @@ class StashPanel(QWidget):
                 border-bottom: 1px solid #1a1a38;
                 color: #94a3b8;
                 font-size: 12px;
-                font-family: 'Menlo', monospace;
+                font-family: 'Menlo';
             }
             QListWidget::item:hover { background: #1e1e38; color: #e2e8f0; }
-            QListWidget::item:selected { background: #312e81; color: #c7d2fe; }
+            QListWidget::item:selected { background: #0c4a6e; color: #bae6fd; }
         """)
         self._list.currentRowChanged.connect(self._on_selection_changed)
         list_layout.addWidget(self._list)
@@ -331,7 +331,7 @@ class _StashMessageDialog(QDialog):
         self._input.setStyleSheet(
             "QLineEdit { background:#252540; color:#e2e8f0; border:1px solid #3d3d6b;"
             "border-radius:6px; padding:4px 10px; font-size:13px; }"
-            "QLineEdit:focus { border-color:#6366f1; }"
+            "QLineEdit:focus { border-color:#0ea5e9; }"
         )
         layout.addWidget(self._input)
 

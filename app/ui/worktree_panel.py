@@ -52,7 +52,7 @@ class _WorktreeCard(QFrame):
         # 왼쪽 액센트 바 (색 블록으로 구분)
         accent_bar = QLabel()
         accent_bar.setFixedWidth(4)
-        accent_color = "#4f46e5" if is_main else ("#ef4444" if is_locked else "#334155")
+        accent_color = "#0284c7" if is_main else ("#ef4444" if is_locked else "#334155")
         accent_bar.setStyleSheet(
             f"background: {accent_color}; border-radius: 2px; border: none;"
         )
@@ -80,8 +80,8 @@ class _WorktreeCard(QFrame):
         branch = wt.get("branch", "(unknown)")
         branch_lbl = QLabel(branch)
         branch_lbl.setStyleSheet(
-            "color: #c7d2fe; font-size: 13px; font-weight: 700;"
-            "font-family: 'Menlo', monospace; border: none; background: transparent;"
+            "color: #bae6fd; font-size: 13px; font-weight: 700;"
+            "font-family: 'Menlo'; border: none; background: transparent;"
         )
         text_col.addWidget(branch_lbl)
 
@@ -102,7 +102,7 @@ class _WorktreeCard(QFrame):
 
         commit_lbl = QLabel(wt.get("commit", "???????"))
         commit_lbl.setStyleSheet(
-            "color: #334155; font-size: 11px; font-family: 'Menlo', monospace;"
+            "color: #334155; font-size: 11px; font-family: 'Menlo';"
             "border: none; background: transparent;"
         )
         right.addWidget(commit_lbl, alignment=Qt.AlignmentFlag.AlignRight)
@@ -110,7 +110,7 @@ class _WorktreeCard(QFrame):
         if is_main:
             tag = QLabel("MAIN")
             tag.setStyleSheet(
-                "background: #312e81; color: #818cf8;"
+                "background: #0c4a6e; color: #38bdf8;"
                 "border-radius: 4px; padding: 2px 8px;"
                 "font-size: 10px; font-weight: 700; border: none;"
             )
@@ -160,7 +160,7 @@ class WorktreePanel(QWidget):
         refresh_btn = QPushButton("↻ 새로고침")
         refresh_btn.setFixedHeight(28)
         refresh_btn.setStyleSheet(
-            "QPushButton { background: #252540; color: #818cf8; border: 1px solid #3d3d6b; "
+            "QPushButton { background: #252540; color: #38bdf8; border: 1px solid #3d3d6b; "
             "border-radius: 5px; padding: 2px 10px; font-size: 12px; }"
             "QPushButton:hover { background: #2d2d50; }"
         )

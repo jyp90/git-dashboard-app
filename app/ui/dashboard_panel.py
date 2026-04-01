@@ -58,8 +58,8 @@ class _SectionHeader(QLabel):
 class _ActionButton(QPushButton):
     """대시보드 액션 버튼."""
     _STYLES = {
-        "primary":  ("background:#4f46e5; color:white; border:none;",
-                     "background:#4338ca; color:white; border:none;"),
+        "primary":  ("background:#0284c7; color:white; border:none;",
+                     "background:#0369a1; color:white; border:none;"),
         "success":  ("background:#166534; color:#4ade80; border:1px solid #15803d;",
                      "background:#14532d; color:#4ade80; border:1px solid #15803d;"),
         "warning":  ("background:#78350f; color:#fbbf24; border:1px solid #92400e;",
@@ -141,6 +141,7 @@ class DashboardPanel(QWidget):
         local_lbl.setStyleSheet("color:#64748b; font-size:10px; font-weight:600; letter-spacing:0.8px; margin-bottom:4px;")
         local_col.addWidget(local_lbl)
         self._local_list = self._build_branch_list()
+        self._local_list.itemDoubleClicked.connect(self._on_branch_checkout)
         local_col.addWidget(self._local_list)
         branch_row.addLayout(local_col)
 
@@ -166,13 +167,13 @@ class DashboardPanel(QWidget):
 
         # 브랜치 아이콘 + 이름
         icon = QLabel("⎇")
-        icon.setStyleSheet("font-size:22px; color:#818cf8; margin-right:2px;")
+        icon.setStyleSheet("font-size:22px; color:#38bdf8; margin-right:2px;")
         card_layout.addWidget(icon)
 
         self._branch_name = QLabel("—")
         self._branch_name.setStyleSheet(
             "font-size:20px; font-weight:700; color:#e2e8f0;"
-            "font-family:'SF Mono','Menlo','Fira Code',monospace; margin-right:10px;"
+            "font-family:'Menlo'; margin-right:10px;"
         )
         card_layout.addWidget(self._branch_name)
 
@@ -257,7 +258,7 @@ class DashboardPanel(QWidget):
                 border-radius: 8px;
                 outline: none;
                 gridline-color: transparent;
-                font-family: 'SF Mono','Menlo','Fira Code',monospace;
+                font-family: 'Menlo';
                 font-size: 12px;
                 color: #94a3b8;
             }
@@ -266,7 +267,7 @@ class DashboardPanel(QWidget):
                 border-bottom: 1px solid #1a1a38;
             }
             QTableWidget::item:hover { background: #1e1e38; color: #e2e8f0; }
-            QTableWidget::item:selected { background: #312e81; color: #c7d2fe; }
+            QTableWidget::item:selected { background: #0c4a6e; color: #bae6fd; }
             QHeaderView::section {
                 background: #0f0f1f;
                 color: #475569;
@@ -296,7 +297,7 @@ class DashboardPanel(QWidget):
             QListWidget::item {
                 padding: 5px 10px;
                 border-radius: 4px;
-                font-family: 'SF Mono','Menlo',monospace;
+                font-family: 'Menlo';
                 font-size: 12px;
                 color: #64748b;
             }
@@ -408,6 +409,26 @@ class DashboardPanel(QWidget):
             self._msg_label.setText("")
             self._controller.create_hotfix_branch(issue_id.strip())
 
+    def _on_branch_checkout(self, item: QListWidgetItem) -> None:
+        """브랜치 더블클릭 → checkout (F-22)."""
+        branch = item.text().strip().lstrip("●○ ")
+        repo = self._controller.get_repository()
+        if not repo or not branch:
+            return
+        from app.controller.git_worker import GitWorker
+        worker = GitWorker(lambda: repo.checkout_branch(branch))
+        def _done(ok):
+            if ok:
+                self._controller.refresh_branch_summary()
+                self._msg_label.setStyleSheet("color:#4ade80; font-size:12px; padding:4px 0;")
+                self._msg_label.setText(f"✓ Checked out: {branch}")
+            else:
+                self._msg_label.setStyleSheet("color:#f87171; font-size:12px; padding:4px 0;")
+                self._msg_label.setText(f"Checkout 실패: {branch}")
+        worker.result_ready.connect(_done)
+        worker.start()
+        self._checkout_worker = worker
+
     def _on_branch_created(self, result: BranchResult) -> None:
         color = "#4ade80" if result.success else "#f87171"
         self._msg_label.setStyleSheet(f"color:{color}; font-size:12px; padding:4px 0;")
@@ -457,7 +478,7 @@ class _PrCheckDialog(QDialog):
         result_text.setFixedHeight(160)
         result_text.setStyleSheet(
             "background:#141428; border-radius:8px; color:#94a3b8;"
-            "font-family:'SF Mono','Menlo',monospace; font-size:12px; padding:8px;"
+            "font-family:'Menlo'; font-size:12px; padding:8px;"
         )
         lines = []
         for item in report.items:
@@ -495,7 +516,7 @@ class _HookResultDialog(QDialog):
         output_text.setFixedHeight(180)
         output_text.setStyleSheet(
             "background:#141428; border-radius:8px; color:#94a3b8;"
-            "font-family:'SF Mono','Menlo',monospace; font-size:12px; padding:8px;"
+            "font-family:'Menlo'; font-size:12px; padding:8px;"
         )
         combined = result.stdout or result.stderr or "(출력 없음)"
         output_text.setPlainText(combined)

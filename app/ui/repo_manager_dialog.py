@@ -101,7 +101,7 @@ class RepoManagerDialog(QDialog):
         browse_btn = QPushButton("폴더 선택")
         browse_btn.setFixedWidth(90)
         browse_btn.setStyleSheet(
-            "background-color:#252540; color:#a5b4fc;"
+            "background-color:#252540; color:#7dd3fc;"
             "border:1px solid #3d3d6b; border-radius:6px; padding:6px 10px;"
         )
         browse_btn.clicked.connect(self._on_browse)
