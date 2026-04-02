@@ -58,7 +58,7 @@ class GitRepository:
 
     def get_status(self) -> bool:
         """작업 디렉토리에 미커밋 변경사항이 있으면 True."""
-        return self._repo.is_dirty(untracked_files=True)
+        return self._repo.is_dirty(untracked_files=False)
 
     def get_ahead_behind(self, remote_branch: str = "origin/develop") -> tuple[int, int]:
         """현재 브랜치와 remote_branch 간 ahead/behind 커밋 수 반환."""

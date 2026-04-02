@@ -94,7 +94,7 @@ class RepoManagerDialog(QDialog):
         # 경로 입력 행
         path_row = QHBoxLayout()
         self._path_input = QLineEdit()
-        self._path_input.setPlaceholderText("/Users/jypark/dev/my-project")
+        self._path_input.setPlaceholderText("/Users/username/projectpath")
         self._path_input.setMinimumHeight(34)
         path_row.addWidget(self._path_input, stretch=1)
 

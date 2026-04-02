@@ -4,12 +4,15 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
+from PyQt6.QtNetwork import QLocalServer, QLocalSocket
 from PyQt6.QtWidgets import QApplication, QSystemTrayIcon
 
 from app.controller.workflow_controller import WorkflowController
 from app.infrastructure.config_store import ConfigStore
 from app.ui.main_window import MainWindow
 from app.ui.menu_bar_app import MenuBarApp
+
+_INSTANCE_KEY = "GitDashboard-SingleInstance"
 
 
 def _resource_base() -> Path:
@@ -27,10 +30,31 @@ def _load_stylesheet() -> str:
     return ""
 
 
+def _is_already_running() -> bool:
+    """이미 실행 중인 인스턴스에 신호를 보내고 True 반환."""
+    socket = QLocalSocket()
+    socket.connectToServer(_INSTANCE_KEY)
+    if socket.waitForConnected(300):
+        socket.write(b"raise")
+        socket.flush()
+        socket.disconnectFromServer()
+        return True
+    return False
+
+
 def main() -> None:
     app = QApplication(sys.argv)
     app.setApplicationName("Git Dashboard")
     app.setOrganizationName("jypark")
+
+    # 중복 실행 방지
+    if _is_already_running():
+        sys.exit(0)
+
+    # 단일 인스턴스 서버 등록
+    server = QLocalServer()
+    QLocalServer.removeServer(_INSTANCE_KEY)  # 이전 비정상 종료 잔여 소켓 정리
+    server.listen(_INSTANCE_KEY)
 
     # 윈도우 닫아도 트레이에 상주
     app.setQuitOnLastWindowClosed(False)
@@ -46,6 +70,17 @@ def main() -> None:
 
     # 메뉴바 트레이 초기화 (시스템 트레이 지원 시)
     tray_app = MenuBarApp(controller, window)
+
+    def _on_new_connection() -> None:
+        """두 번째 실행 시도 → 기존 창 앞으로."""
+        conn = server.nextPendingConnection()
+        if conn:
+            conn.close()
+        window.show()
+        window.raise_()
+        window.activateWindow()
+
+    server.newConnection.connect(_on_new_connection)
 
     window.show()
 

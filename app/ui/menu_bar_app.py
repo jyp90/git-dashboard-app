@@ -1,27 +1,54 @@
 """MenuBarApp — F-08 macOS 메뉴바 상주 (QSystemTrayIcon 기반)."""
 from __future__ import annotations
 
-from PyQt6.QtCore import QTimer
-from PyQt6.QtGui import QIcon, QPixmap, QColor, QPainter
+import os
+from PyQt6.QtCore import QTimer, QRectF, QPointF, Qt
+from PyQt6.QtGui import (
+    QIcon, QPixmap, QColor, QPainter, QPen, QBrush, QPainterPath
+)
 from PyQt6.QtWidgets import QApplication, QMenu, QSystemTrayIcon
 
 from app.controller.workflow_controller import WorkflowController
 from app.domain.models import BranchStatus
 
+_ICON_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+    "resources", "icons", "menu_icon.png",
+)
 
-def _make_tray_icon(color: str = "#6366f1") -> QIcon:
-    """간단한 원형 아이콘 생성."""
-    size = 22
-    pixmap = QPixmap(size, size)
-    pixmap.fill(QColor(0, 0, 0, 0))
-    painter = QPainter(pixmap)
-    painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-    painter.setBrush(QColor(color))
-    painter.setPen(QColor(color))
-    margin = 3
-    painter.drawEllipse(margin, margin, size - margin * 2, size - margin * 2)
-    painter.end()
-    return QIcon(pixmap)
+
+def _make_tray_icon(status_color: str | None = None) -> QIcon:
+    """Git 브랜치 아이콘 생성.
+
+    status_color가 주어지면 base 이미지 위에 상태 표시 뱃지를 그림.
+    """
+    SIZE = 28
+
+    # base: PNG 파일 사용, 없으면 fallback
+    if os.path.isfile(_ICON_PATH):
+        base = QPixmap(_ICON_PATH).scaled(
+            SIZE, SIZE,
+            Qt.AspectRatioMode.KeepAspectRatio,
+            Qt.TransformationMode.SmoothTransformation,
+        )
+    else:
+        base = QPixmap(SIZE, SIZE)
+        base.fill(QColor(0, 0, 0, 0))
+
+    if not status_color:
+        return QIcon(base)
+
+    # 상태 뱃지 오버레이 (우하단 5px 원)
+    result = base.copy()
+    p = QPainter(result)
+    p.setRenderHint(QPainter.RenderHint.Antialiasing)
+    r = 4
+    x, y = SIZE - r - 1, SIZE - r - 1
+    p.setPen(QPen(QColor("#0f0f1a"), 1.2))
+    p.setBrush(QBrush(QColor(status_color)))
+    p.drawEllipse(QPointF(x, y), r, r)
+    p.end()
+    return QIcon(result)
 
 
 _STATUS_COLORS = {
@@ -51,7 +78,7 @@ class MenuBarApp:
             self._connect_signals()
 
     def _setup_tray(self) -> None:
-        self._tray = QSystemTrayIcon(_make_tray_icon())
+        self._tray = QSystemTrayIcon(_make_tray_icon(None))
         self._tray.setToolTip("Git Dashboard")
         self._tray.activated.connect(self._on_tray_activated)
         self._tray.setContextMenu(self._build_menu())
@@ -91,7 +118,7 @@ class MenuBarApp:
         self._current_branch = summary.current
         self._current_status = summary.status
 
-        color = _STATUS_COLORS.get(summary.status, "#6366f1")
+        color = _STATUS_COLORS.get(summary.status)
         if self._tray:
             self._tray.setIcon(_make_tray_icon(color))
             self._tray.setToolTip(

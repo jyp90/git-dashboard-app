@@ -54,6 +54,7 @@ class MainWindow(QMainWindow):
     """메인 윈도우 — 좌측 저장소 사이드바 + 우측 통합 탭 대시보드."""
 
     _REFRESH_INTERVAL_MS = 30_000
+    _AUTO_FETCH_INTERVAL_MS = 10 * 60 * 1_000  # 10분
 
     def __init__(self, controller: WorkflowController) -> None:
         super().__init__()
@@ -319,6 +320,29 @@ class MainWindow(QMainWindow):
         self._timer.timeout.connect(self._controller.refresh_branch_summary)
         self._timer.start(self._REFRESH_INTERVAL_MS)
 
+        self._fetch_timer = QTimer(self)
+        self._fetch_timer.timeout.connect(self._auto_fetch)
+        self._fetch_timer.start(self._AUTO_FETCH_INTERVAL_MS)
+
+    def _auto_fetch(self) -> None:
+        """10분마다 origin fetch (백그라운드, UI 블로킹 없음)."""
+        repo = self._controller.get_repository()
+        if not repo:
+            return
+        from app.controller.git_worker import GitWorker
+        worker = GitWorker(repo.fetch)
+        def _done(_):
+            self._controller.refresh_branch_summary()
+            self._status_label.setText("✓ Auto-fetch 완료")
+            QTimer.singleShot(3_000, lambda: self._status_label.setText(""))
+        def _err(msg):
+            self._status_label.setText(f"Auto-fetch 오류: {msg}")
+            QTimer.singleShot(5_000, lambda: self._status_label.setText(""))
+        worker.result_ready.connect(_done)
+        worker.error_occurred.connect(_err)
+        worker.start()
+        self._auto_fetch_worker = worker
+
     # ── 이벤트 핸들러 ──────────────────────────────────────────────────────
 
     def _open_repo_manager(self) -> None:
@@ -348,6 +372,7 @@ class MainWindow(QMainWindow):
             (5, "rebase",   "🔁 Rebase"),
             (6, "merge",    "⚡ Conflict"),
         ]
+        current = self._tabs.currentIndex()
         self._tabs.blockSignals(True)
         for index, name, label in _tab_info:
             if index >= self._tabs.count():
@@ -360,6 +385,9 @@ class MainWindow(QMainWindow):
             self._tabs.removeTab(index)
             self._tabs.insertTab(index, placeholder, label)
         self._tabs.blockSignals(False)
+        self._tabs.setCurrentIndex(current)
+        # 현재 탭이 v2 패널이었다면 새 저장소 기준으로 즉시 재로드
+        self._on_tab_changed(current)
 
     def _on_tab_changed(self, index: int) -> None:
         """탭 전환 시 lazy load."""
