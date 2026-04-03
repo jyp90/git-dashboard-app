@@ -27,10 +27,10 @@ dmg:
 		--hide-extension "Git Dashboard.app" \
 		--app-drop-link 450 185 \
 		--no-internet-enable \
-		"dist/GitDashboard-0.1.0.dmg" \
+		"dist/GitDashboard-1.1.0.dmg" \
 		"dist/Git Dashboard.app"
-	@echo "DMG ready: dist/GitDashboard-0.1.0.dmg"
-	@ls -lh "dist/GitDashboard-0.1.0.dmg"
+	@echo "DMG ready: dist/GitDashboard-1.1.0.dmg"
+	@ls -lh "dist/GitDashboard-1.1.0.dmg"
 
 ## 빌드된 .app 실행
 open:
